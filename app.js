@@ -72,17 +72,14 @@ function initSparkleStars() {
     const overlay = document.getElementById("stars-overlay");
     if (!overlay) return;
     
-    const initialStarsCount = window.innerWidth < 768 ? 10 : 20;
-    for (let i = 0; i < initialStarsCount; i++) {
+    // Create a fixed set of stars once. No dynamic DOM insertion/deletion intervals needed!
+    const count = window.innerWidth < 768 ? 12 : 24;
+    for (let i = 0; i < count; i++) {
         spawnStar(overlay, true);
     }
-    
-    setInterval(() => {
-        spawnStar(overlay, false);
-    }, 2500);
 }
 
-function spawnStar(container, isInitial = false) {
+function spawnStar(container, isInitial = true) {
     const star = document.createElement("div");
     const isDot = Math.random() > 0.6;
     star.className = isDot ? "sparkle-dot" : "sparkle-star";
@@ -94,22 +91,14 @@ function spawnStar(container, isInitial = false) {
     star.style.left = `${Math.random() * 100}%`;
     star.style.top = `${Math.random() * 100}%`;
     
-    if (isInitial) {
-        const delay = -Math.random() * 4;
-        star.style.animationDelay = `${delay}s`;
-    } else {
-        star.style.animationDelay = `0s`;
-    }
+    // Negative delay so they start at different points in their animation cycle
+    const delay = -Math.random() * 6;
+    star.style.animationDelay = `${delay}s`;
     
-    const duration = Math.random() * 3 + 3;
+    const duration = Math.random() * 4 + 3; // 3s to 7s
     star.style.animationDuration = `${duration}s`;
     
     container.appendChild(star);
-    
-    const maxCapacity = 30;
-    if (container.children.length > maxCapacity) {
-        container.removeChild(container.firstChild);
-    }
 }
 
 /* ==========================================================================
@@ -336,11 +325,8 @@ function initBubbleLetters() {
 
     // Mobile Idle Letter Hover Simulator
     const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    if (isMobile) {
+    if (isMobile && letters.length > 0) {
         setInterval(() => {
-            const letters = document.querySelectorAll(".pop-letter");
-            if (letters.length === 0) return;
-            
             const randomIndex = Math.floor(Math.random() * letters.length);
             const letter = letters[randomIndex];
             
