@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fantastic Fashion Interactive Engine - Mobile Performance Optimized
+   Fantastic Fashion Interactive Engine - Ultra Performance Optimized
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -72,16 +72,14 @@ function initSparkleStars() {
     const overlay = document.getElementById("stars-overlay");
     if (!overlay) return;
     
-    // Spawn initial stars
-    const initialStarsCount = window.innerWidth < 768 ? 10 : 20; // Reduced count to save layout threads
+    const initialStarsCount = window.innerWidth < 768 ? 10 : 20;
     for (let i = 0; i < initialStarsCount; i++) {
         spawnStar(overlay, true);
     }
     
-    // Slower intervals
     setInterval(() => {
         spawnStar(overlay, false);
-    }, 2000);
+    }, 2500);
 }
 
 function spawnStar(container, isInitial = false) {
@@ -108,32 +106,27 @@ function spawnStar(container, isInitial = false) {
     
     container.appendChild(star);
     
-    const maxCapacity = 40; // Prune earlier to keep layout lightweight
+    const maxCapacity = 30;
     if (container.children.length > maxCapacity) {
         container.removeChild(container.firstChild);
     }
 }
 
 /* ==========================================================================
-   3. Optimized Magic Wand Trail & Touch Gesture Engine
+   3. Falling Stardust Trail Engine (Dynamic Sleep Loop)
    ========================================================================== */
 
 let globalParticles = [];
-let activeGesturePath = [];
-let isDrawingGesture = false;
-let fadingPaths = [];
+let isLoopRunning = false; // Controls if animation loop is active
 
-// Throttling coordinates tracker
 let lastSpawnX = 0;
 let lastSpawnY = 0;
-const SPAWN_THRESHOLD = 18; // Only spawn a star if pointer moves 18px
+const SPAWN_THRESHOLD = 20; // Move at least 20px to spawn stardust
 
 function initMouseTrail() {
     const canvas = document.getElementById("trail-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    
-    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -142,69 +135,71 @@ function initMouseTrail() {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     
-    // Spawn mouse move trail on Desktop (Throttled)
+    // Spawn mouse stardust on Desktop
     window.addEventListener("mousemove", (e) => {
         const dist = Math.hypot(e.clientX - lastSpawnX, e.clientY - lastSpawnY);
         if (dist > SPAWN_THRESHOLD) {
-            globalParticles.push(createParticle(e.clientX, e.clientY));
+            addParticle(createParticle(e.clientX, e.clientY));
             lastSpawnX = e.clientX;
             lastSpawnY = e.clientY;
         }
     });
 
-    // Touch events for drawing gestures ONLY on Mobile/Tablet (Throttled)
-    if (isTouchDevice) {
-        window.addEventListener("touchstart", (e) => {
-            if (e.touches.length > 0) {
-                const touch = e.touches[0];
-                if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box") || touch.target.closest(".pop-letter")) return;
-                
-                startGesture(touch.clientX, touch.clientY);
-                spawnBurst(touch.clientX, touch.clientY);
+    // Touch events for stardust trail on Mobile
+    window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            const dist = Math.hypot(touch.clientX - lastSpawnX, touch.clientY - lastSpawnY);
+            if (dist > SPAWN_THRESHOLD) {
+                addParticle(createParticle(touch.clientX, touch.clientY));
                 lastSpawnX = touch.clientX;
                 lastSpawnY = touch.clientY;
             }
-        });
+        }
+    });
 
-        window.addEventListener("touchmove", (e) => {
-            if (e.touches.length > 0) {
-                const touch = e.touches[0];
-                if (isDrawingGesture) {
-                    addGesturePoint(touch.clientX, touch.clientY);
-                }
-                
-                const dist = Math.hypot(touch.clientX - lastSpawnX, touch.clientY - lastSpawnY);
-                if (dist > SPAWN_THRESHOLD) {
-                    globalParticles.push(createParticle(touch.clientX, touch.clientY));
-                    lastSpawnX = touch.clientX;
-                    lastSpawnY = touch.clientY;
-                }
-            }
-        });
-
-        window.addEventListener("touchend", () => {
-            endGesture();
-        });
-    }
-
-    // Spawn Burst on click (Desktop) or tap
+    // Tap/Click star explosions
     window.addEventListener("click", (e) => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle") || e.target.closest(".pop-letter")) return;
         spawnBurst(e.clientX, e.clientY);
     });
+
+    window.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box") || touch.target.closest(".pop-letter")) return;
+            spawnBurst(touch.clientX, touch.clientY);
+        }
+    });
     
-    // Sparkle Particle Creator (Drifts DOWNWARDS and stays optimized)
+    function addParticle(p) {
+        globalParticles.push(p);
+        
+        // Cap particles array to keep mobile rendering fast
+        const maxParticles = 40;
+        if (globalParticles.length > maxParticles) {
+            globalParticles.shift();
+        }
+
+        // Start animation loop if it's currently sleeping
+        if (!isLoopRunning) {
+            isLoopRunning = true;
+            requestAnimationFrame(updateParticles);
+        }
+    }
+
+    // Sparkle Particle Creator (Drifts DOWNWARDS)
     function createParticle(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
         return {
             x: x,
             y: y,
             vx: (Math.random() - 0.5) * 1.5,
-            vy: Math.random() * 2 + 1,            // Drifts downwards
-            size: Math.random() * 10 + 6,
+            vy: Math.random() * 2 + 1,            // Falls down
+            size: Math.random() * 9 + 5,
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.01 + 0.008,   // Fades out in ~2 seconds to prevent list buildup
+            decay: Math.random() * 0.015 + 0.01,   // Fades out in 1.5-2 seconds
             rotation: Math.random() * Math.PI * 2,
             rotationSpeed: (Math.random() - 0.5) * 0.08
         };
@@ -228,15 +223,15 @@ function initMouseTrail() {
     }
     
     function updateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Capping active particles to prevent mobile lag
-        const maxParticles = isTouchDevice ? 30 : 60;
-        if (globalParticles.length > maxParticles) {
-            globalParticles.splice(0, globalParticles.length - maxParticles);
+        // If there are no particles, clear canvas and sleep the loop (0% idle CPU)
+        if (globalParticles.length === 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            isLoopRunning = false;
+            return;
         }
 
-        // 1. Draw stardust particles
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         for (let i = globalParticles.length - 1; i >= 0; i--) {
             const p = globalParticles[i];
             p.x += p.vx;
@@ -250,203 +245,30 @@ function initMouseTrail() {
                 drawSparkle(ctx, p.x, p.y, p.size, p.rotation, p.color, p.alpha);
             }
         }
-
-        // 2. Draw active drawing path (No shadowBlur to preserve CPU/GPU cycles)
-        if (activeGesturePath.length > 1) {
-            ctx.save();
-            ctx.strokeStyle = "rgba(0, 229, 255, 0.9)";
-            ctx.lineWidth = 6;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-            
-            ctx.beginPath();
-            ctx.moveTo(activeGesturePath[0].x, activeGesturePath[0].y);
-            for (let i = 1; i < activeGesturePath.length; i++) {
-                ctx.lineTo(activeGesturePath[i].x, activeGesturePath[i].y);
-            }
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        // 3. Draw fading previous paths (No shadowBlur)
-        for (let j = fadingPaths.length - 1; j >= 0; j--) {
-            const fp = fadingPaths[j];
-            fp.alpha -= 0.05;
-            
-            if (fp.alpha <= 0) {
-                fadingPaths.splice(j, 1);
-            } else {
-                ctx.save();
-                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`;
-                ctx.lineWidth = 6 * fp.alpha;
-                ctx.lineCap = "round";
-                ctx.lineJoin = "round";
-                
-                ctx.beginPath();
-                ctx.moveTo(fp.path[0].x, fp.path[0].y);
-                for (let k = 1; k < fp.path.length; k++) {
-                    ctx.lineTo(fp.path[k].x, fp.path[k].y);
-                }
-                ctx.stroke();
-                ctx.restore();
-            }
-        }
         
         requestAnimationFrame(updateParticles);
     }
     
-    updateParticles();
-}
-
-// Sparkle Burst (Optimized count for mobile)
-function spawnBurst(x, y) {
-    const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-    const count = 12; // Lowered to 12
-    for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
-        const speed = Math.random() * 3 + 1.5;
-        globalParticles.push({
-            x: x,
-            y: y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed + 1.5, // Drifts down
-            size: Math.random() * 10 + 5,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            alpha: 1,
-            decay: Math.random() * 0.012 + 0.008, // Prunes fast
-            rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.12
-        });
-    }
-}
-
-// Drawing Gestures Engine
-function startGesture(x, y) {
-    activeGesturePath = [{x, y}];
-    isDrawingGesture = true;
-}
-
-function addGesturePoint(x, y) {
-    if (!isDrawingGesture) return;
-    const last = activeGesturePath[activeGesturePath.length - 1];
-    if (last) {
-        const dist = Math.hypot(x - last.x, y - last.y);
-        if (dist < 8) return; // ignore minor moves to save memory
-    }
-    activeGesturePath.push({x, y});
-}
-
-function endGesture() {
-    if (!isDrawingGesture) return;
-    isDrawingGesture = false;
-    
-    if (activeGesturePath.length > 5) {
-        analyzeGesture(activeGesturePath);
-        fadingPaths.push({
-            path: activeGesturePath,
-            alpha: 1
-        });
-    }
-    activeGesturePath = [];
-}
-
-// Simplify path to swipe direction changes
-function getDirectionSequence(path) {
-    const directions = [];
-    let lastDir = "";
-    
-    const filtered = [];
-    let lastPt = path[0];
-    filtered.push(lastPt);
-    for (let i = 1; i < path.length; i++) {
-        const dist = Math.hypot(path[i].x - lastPt.x, path[i].y - lastPt.y);
-        if (dist > 25) { // Spaced out more for clearer direction tracing
-            lastPt = path[i];
-            filtered.push(lastPt);
+    // Sparkle Burst (Click/Tap triggers)
+    function spawnBurst(x, y) {
+        const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+            const speed = Math.random() * 3 + 1.2;
+            addParticle({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed + 1.2, // Drifts down
+                size: Math.random() * 10 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                alpha: 1,
+                decay: Math.random() * 0.018 + 0.012, // Prunes fast
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.12
+            });
         }
-    }
-    
-    if (filtered.length < 3) return [];
-    
-    for (let i = 1; i < filtered.length; i++) {
-        const dx = filtered[i].x - filtered[i-1].x;
-        const dy = filtered[i].y - filtered[i-1].y;
-        
-        let dir = "";
-        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        
-        if (angle >= -22.5 && angle < 22.5) dir = "R";
-        else if (angle >= 22.5 && angle < 67.5) dir = "DR";
-        else if (angle >= 67.5 && angle < 112.5) dir = "D";
-        else if (angle >= 112.5 && angle < 157.5) dir = "DL";
-        else if (angle >= 157.5 || angle < -157.5) dir = "L";
-        else if (angle >= -157.5 && angle < -112.5) dir = "UL";
-        else if (angle >= -112.5 && angle < -67.5) dir = "U";
-        else if (angle >= -67.5 && angle < -22.5) dir = "UR";
-        
-        if (dir !== lastDir) {
-            directions.push(dir);
-            lastDir = dir;
-        }
-    }
-    return directions;
-}
-
-// Strict gesture recognizer for capital E and K
-function analyzeGesture(path) {
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    path.forEach(p => {
-        if (p.x < minX) minX = p.x;
-        if (p.x > maxX) maxX = p.x;
-        if (p.y < minY) minY = p.y;
-        if (p.y > maxY) maxY = p.y;
-    });
-    
-    const width = maxX - minX;
-    const height = maxY - minY;
-    
-    if (width < 60 || height < 60) return;
-    
-    const dirs = getDirectionSequence(path);
-    if (dirs.length < 3) return;
-    
-    // Strict K: Starts D (down spine), then moves UR/R (up-right diagonal), then DR/R (down-right diagonal)
-    let isK = false;
-    const dIdx = dirs.findIndex(d => d.includes("D") && !d.includes("R"));
-    if (dIdx !== -1 && dIdx < dirs.length - 2) {
-        const urIdx = dirs.slice(dIdx).findIndex(d => d.includes("U") || d === "R");
-        if (urIdx !== -1) {
-            const drIdx = dirs.slice(dIdx + urIdx).findIndex(d => d.includes("D") || d === "R");
-            if (drIdx !== -1) {
-                isK = true;
-            }
-        }
-    }
-    
-    // Strict Capital E: Leftwards top bar (L), down spine (D), rightwards bottom bar (R), up, middle bar (R)
-    // Sequence must contain: L, D, R, U, R
-    let isE = false;
-    const l1 = dirs.findIndex(d => d.includes("L"));
-    if (l1 !== -1) {
-        const d1 = dirs.slice(l1).findIndex(d => d.includes("D"));
-        if (d1 !== -1) {
-            const r1 = dirs.slice(l1 + d1).findIndex(d => d.includes("R"));
-            if (r1 !== -1) {
-                const u1 = dirs.slice(l1 + d1 + r1).findIndex(d => d.includes("U"));
-                if (u1 !== -1) {
-                    const r2 = dirs.slice(l1 + d1 + r1 + u1).findIndex(d => d.includes("R"));
-                    if (r2 !== -1) {
-                        isE = true;
-                    }
-                }
-            }
-        }
-    }
-    
-    if (isK) {
-        triggerEasterEgg("kayla");
-    } else if (isE) {
-        triggerEasterEgg("erika");
     }
 }
 
@@ -529,7 +351,7 @@ function initBubbleLetters() {
                     letter.classList.remove("hover-simulate");
                 }, 850);
             }
-        }, 1400);
+        }, 1800); // Wiggle slightly less frequently
     }
 }
 
@@ -622,13 +444,11 @@ function initEasterEggs() {
     // Double Tap subtitle trigger (Alternative Mobile Easter Egg)
     const subtitle = document.querySelector(".subtitle");
     if (subtitle) {
-        // Change subtitle text to have clickable spans for Kayla and Erika
-        subtitle.innerHTML = `By <span class="owner-tap" id="tap-kayla" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4);">Kayla</span> and <span class="owner-tap" id="tap-erika" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4);">Erika</span>`;
+        subtitle.innerHTML = `By <span class="owner-tap" id="tap-kayla" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4); font-weight: bold; transition: color 0.2s;">Kayla</span> and <span class="owner-tap" id="tap-erika" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4); font-weight: bold; transition: color 0.2s;">Erika</span>`;
         
         const tapKayla = document.getElementById("tap-kayla");
         const tapErika = document.getElementById("tap-erika");
         
-        // Support double tap / double click
         let lastTapKayla = 0;
         let lastTapErika = 0;
         
@@ -648,7 +468,6 @@ function initEasterEggs() {
             lastTapErika = now;
         });
 
-        // Touch event handlers for mobile responsive triggers
         tapKayla.addEventListener("touchstart", (e) => {
             const now = Date.now();
             if (now - lastTapKayla < 350) {
@@ -686,7 +505,7 @@ function triggerEasterEgg(name) {
         emojis = ["🌈", "🌟", "🎨", "💍", "💎", "💫", "🍕", "🐱", "🐶", "🧁", "🍩"];
     }
     
-    const count = 25; // Decreased count slightly to optimize layout render loops
+    const count = 20; // Reduced count to keep mobile stardust showers smooth
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const element = document.createElement("div");
@@ -743,7 +562,7 @@ function createConfetti(container) {
     container.innerHTML = "";
     
     const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-    const count = 30; // Decreased count to keep CPU efficient
+    const count = 20; // Reduced confetti count to keep rendering fast
     
     for (let i = 0; i < count; i++) {
         const piece = document.createElement("div");
