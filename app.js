@@ -415,6 +415,38 @@ function incrementPopCount() {
     }
 }
 
+let emojiRainInterval = null;
+
+function startGentleEmojiRain() {
+    if (emojiRainInterval) return;
+    
+    emojiRainInterval = setInterval(() => {
+        const emojis = ["👑", "🏆", "🌟", "✨", "🎈", "🎉", "💖", "💎", "🌈", "⭐", "🍕", "🧁", "🍭", "🧸", "🦄"];
+        const element = document.createElement("div");
+        element.className = "rain-emoji";
+        element.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        element.style.left = `${Math.random() * 95}%`;
+        element.style.transform = `scale(${Math.random() * 0.5 + 0.6})`;
+        
+        // Gentle slow fall for background stardust trail
+        const duration = Math.random() * 5 + 5; // 5s to 10s
+        element.style.animationDuration = `${duration}s`;
+        
+        document.body.appendChild(element);
+        
+        setTimeout(() => {
+            element.remove();
+        }, duration * 1000);
+    }, 800); 
+}
+
+function stopGentleEmojiRain() {
+    if (emojiRainInterval) {
+        clearInterval(emojiRainInterval);
+        emojiRainInterval = null;
+    }
+}
+
 function triggerPopMasterReward() {
     playFanfareSound();
     triggerMassiveEmojiRain();
@@ -451,6 +483,7 @@ function triggerPopMasterReward() {
             activePowerups[powerup] = false;
         });
         document.documentElement.classList.remove("rainbow-shimmer-active");
+        stopGentleEmojiRain();
         updatePowerupsUI();
     }
     
@@ -498,6 +531,10 @@ function activatePowerup(powerup) {
         document.documentElement.classList.add("rainbow-shimmer-active");
     }
     
+    if (powerup === "supertrail") {
+        startGentleEmojiRain();
+    }
+    
     updatePowerupsUI();
 }
 
@@ -508,7 +545,7 @@ function updatePowerupsUI() {
     const activeNames = [];
     if (activePowerups.rainbow) activeNames.push("🌈 Rainbow");
     if (activePowerups.xylophone) activeNames.push("🎹 Xylophone");
-    if (activePowerups.supertrail) activeNames.push("✨ Super Trail");
+    if (activePowerups.supertrail) activeNames.push("✨ Emoji Star Trail");
     
     if (activeNames.length > 0) {
         listEl.innerText = `Powerups Active: ${activeNames.join(" | ")}`;
