@@ -1609,19 +1609,16 @@ footer p:first-child {
 
 /* Rainbow Shimmer - Fever Dream mode! */
 .rainbow-shimmer-active body {
-    background: linear-gradient(rgba(10, 15, 45, 0.82), rgba(10, 15, 45, 0.82)),
-                linear-gradient(135deg, 
-                    #ff2a85 0%, 
-                    #ff9d00 16%, 
-                    #ffff00 33%, 
-                    #00e676 50%, 
-                    #00e5ff 66%, 
-                    #2979ff 83%, 
-                    #b026ff 100%
-                ) !important;
-    background-size: 100% 100%, 600% 600% !important;
-    animation: rainbow-hero-shift 18s ease infinite !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, 
+        #c3ecff 0%,  /* Light Sky Blue */
+        #d2dbff 25%, /* Soft Sky Lavender */
+        #ebd0f0 50%, /* Pale Pink */
+        #ffdcd2 75%, /* Pale Peach */
+        #d1f2d9 100% /* Pale Mint Green */
+    ) !important;
+    background-size: 400% 400% !important;
+    animation: rainbow-body-shift 15s ease infinite !important;
+    color: #0b1126 !important;
 }
 
 .rainbow-shimmer-active .products,
@@ -1688,25 +1685,30 @@ footer p:first-child {
 .rainbow-shimmer-active .product-info h3,
 .rainbow-shimmer-active .product-description,
 .rainbow-shimmer-active .product-price,
-.rainbow-shimmer-active .contact-header h2,
-.rainbow-shimmer-active .contact-header p,
+.rainbow-shimmer-active .contact-card h2,
+.rainbow-shimmer-active .contact-card p,
 .rainbow-shimmer-active .form-group label,
 .rainbow-shimmer-active .form-group input,
 .rainbow-shimmer-active .form-group textarea,
 .rainbow-shimmer-active .challenge-label,
 .rainbow-shimmer-active .custom-orders-banner h3,
 .rainbow-shimmer-active .custom-orders-banner p,
+.rainbow-shimmer-active .coupon-reveal-card .coupon-terms,
+.rainbow-shimmer-active .coupon-reveal-card .coupon-subtext {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Dark navy overrides for text directly on the sky blue background */
+.rainbow-shimmer-active .section-tagline,
+.rainbow-shimmer-active .contact-header h2,
+.rainbow-shimmer-active .contact-header p,
 .rainbow-shimmer-active .teaser-text h3,
 .rainbow-shimmer-active .teaser-text p,
 .rainbow-shimmer-active .teaser-title,
-.rainbow-shimmer-active .teaser-desc,
-.rainbow-shimmer-active .coupon-reveal-card .coupon-terms,
-.rainbow-shimmer-active .coupon-reveal-card .coupon-subtext,
-.rainbow-shimmer-active footer,
-.rainbow-shimmer-active footer p,
-.rainbow-shimmer-active footer .footer-note {
-    color: #ffffff !important;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+.rainbow-shimmer-active .teaser-desc {
+    color: #0b1126 !important;
+    text-shadow: none !important;
 }
 
 /* Custom design for coupon content in rainbow mode */
@@ -1721,7 +1723,7 @@ footer p:first-child {
 
 /* Customizer styles in rainbow mode */
 .rainbow-shimmer-active .active-powerups-list {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     color: #ffffff !important;
     border-color: rgba(255, 255, 255, 0.3) !important;
 }
@@ -1780,7 +1782,7 @@ footer p:first-child {
 .rainbow-shimmer-active .form-group input,
 .rainbow-shimmer-active .form-group textarea {
     background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
     color: #ffffff !important;
 }
 
@@ -1792,7 +1794,8 @@ footer p:first-child {
 
 .rainbow-shimmer-active .form-group input::placeholder,
 .rainbow-shimmer-active .form-group textarea::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
+    color: rgba(255, 255, 255, 0.7) !important; /* highly visible white placeholder */
+    opacity: 1 !important;
 }
 
 /* Headers text gradients */
@@ -1804,6 +1807,7 @@ footer p:first-child {
     -webkit-text-fill-color: transparent !important;
     animation: rainbow-text-flow 4s linear infinite !important;
     display: inline-block;
+    filter: drop-shadow(1px 1px 0px rgba(11, 17, 38, 0.4)) !important;
 }
 
 .rainbow-shimmer-active .submit-btn {
@@ -1814,20 +1818,56 @@ footer p:first-child {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.6) !important;
 }
 
-/* Expanded full-spectrum ROYGBIV gradient shift for the hero background */
+/* Highly animated, spiced up double-layered hero background */
 .rainbow-shimmer-active .hero {
-    background: linear-gradient(rgba(10, 15, 45, 0.45), rgba(10, 15, 45, 0.65)),
-                linear-gradient(135deg, 
-                    #ff2a85 0%, 
-                    #ff9d00 16%, 
-                    #ffff00 33%, 
-                    #00e676 50%, 
-                    #00e5ff 66%, 
-                    #2979ff 83%, 
-                    #b026ff 100%
-                ) !important;
-    background-size: 100% 100%, 600% 600% !important;
-    animation: rainbow-hero-shift 12s linear infinite !important;
+    position: relative !important;
+    background: none !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
+}
+
+.rainbow-shimmer-active .hero::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(135deg, 
+        #ff2a85 0%, 
+        #ff9d00 16%, 
+        #ffff00 33%, 
+        #00e676 50%, 
+        #00e5ff 66%, 
+        #2979ff 83%, 
+        #b026ff 100%
+    ) !important;
+    z-index: -2 !important;
+    animation: rainbow-hue-shift 6s linear infinite !important;
+}
+
+.rainbow-shimmer-active .hero::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(10, 15, 45, 0.35) !important; /* medium-light tint so rainbow pops */
+    z-index: -1 !important;
+}
+
+/* Hero text visibility */
+.rainbow-shimmer-active .subtitle,
+.rainbow-shimmer-active .scroll-link span,
+.rainbow-shimmer-active .arrow {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+.rainbow-shimmer-active footer {
+    background-color: #0b1126 !important;
+    border-top: 4px solid var(--primary-color) !important;
 }
 
 @keyframes rainbow-border-flow {
@@ -1840,7 +1880,21 @@ footer p:first-child {
     100% { background-position: -200% center; }
 }
 
-@keyframes rainbow-hero-shift {
+@keyframes rainbow-hue-shift {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes rainbow-dots-glow {
+    0% { background-color: #ff2a85; box-shadow: 0 0 15px #ff2a85, 0 0 5px #ffffff; }
+    20% { background-color: #ff9d00; box-shadow: 0 0 15px #ff9d00, 0 0 5px #ffffff; }
+    40% { background-color: #ffff00; box-shadow: 0 0 15px #ffff00, 0 0 5px #ffffff; }
+    60% { background-color: #00e5ff; box-shadow: 0 0 15px #00e5ff, 0 0 5px #ffffff; }
+    80% { background-color: #b026ff; box-shadow: 0 0 15px #b026ff, 0 0 5px #ffffff; }
+    100% { background-color: #ff2a85; box-shadow: 0 0 15px #ff2a85, 0 0 5px #ffffff; }
+}
+
+@keyframes rainbow-body-shift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
