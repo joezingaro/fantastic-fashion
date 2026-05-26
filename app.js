@@ -113,7 +113,7 @@ function spawnStar(container, isInitial = false) {
 }
 
 /* ==========================================================================
-   3. Magic Wand Trail & Touch Gesture Engine
+   3. Magic Wand Trail (Falling Stardust) & Touch Gesture Engine
    ========================================================================== */
 
 let globalParticles = [];
@@ -126,6 +126,8 @@ function initMouseTrail() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -133,67 +135,60 @@ function initMouseTrail() {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     
-    // Spawn mouse move trail
+    // Spawn trail on mouse move (Desktop)
     window.addEventListener("mousemove", (e) => {
-        if (isDrawingGesture) {
-            addGesturePoint(e.clientX, e.clientY);
-        }
         for (let i = 0; i < 2; i++) {
             globalParticles.push(createParticle(e.clientX, e.clientY));
         }
     });
 
-    // Touch events for drawing & trails on mobile
-    window.addEventListener("touchstart", (e) => {
-        if (e.touches.length > 0) {
-            const touch = e.touches[0];
-            // Don't draw gesture if tapping form fields or customizer
-            if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box")) return;
-            
-            startGesture(touch.clientX, touch.clientY);
-            spawnBurst(touch.clientX, touch.clientY);
-        }
-    });
-
-    window.addEventListener("touchmove", (e) => {
-        if (e.touches.length > 0) {
-            const touch = e.touches[0];
-            if (isDrawingGesture) {
-                addGesturePoint(touch.clientX, touch.clientY);
+    // Touch events for drawing gestures ONLY on Mobile/Tablet
+    if (isTouchDevice) {
+        window.addEventListener("touchstart", (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box")) return;
+                
+                startGesture(touch.clientX, touch.clientY);
+                spawnBurst(touch.clientX, touch.clientY);
             }
-            globalParticles.push(createParticle(touch.clientX, touch.clientY));
-        }
-    });
+        });
 
-    window.addEventListener("touchend", () => {
-        endGesture();
-    });
+        window.addEventListener("touchmove", (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                if (isDrawingGesture) {
+                    addGesturePoint(touch.clientX, touch.clientY);
+                }
+                globalParticles.push(createParticle(touch.clientX, touch.clientY));
+            }
+        });
 
-    // Mouse drag support for drawing on desktop (hold click to draw)
-    window.addEventListener("mousedown", (e) => {
-        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle") || e.target.closest(".product-card") || e.target.closest("#gift-box")) return;
-        startGesture(e.clientX, e.clientY);
+        window.addEventListener("touchend", () => {
+            endGesture();
+        });
+    }
+
+    // Spawn Burst on click
+    window.addEventListener("click", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle")) return;
         spawnBurst(e.clientX, e.clientY);
     });
-
-    window.addEventListener("mouseup", () => {
-        endGesture();
-    });
     
-    // Sparkle Particle Creator
+    // Sparkle Particle Creator (Configured to drift DOWNWARDS and last longer)
     function createParticle(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
         return {
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 3,
-            vy: (Math.random() - 0.5) * 3 - 1.2,
-            size: Math.random() * 12 + 6, // Grown particle size
+            vx: (Math.random() - 0.5) * 2,
+            vy: Math.random() * 2.2 + 1.2,      // Positive vy causes stardust to fall DOWNWARDS
+            size: Math.random() * 12 + 6,       // Large stardust particles
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.012 + 0.008, // Fades slower for a longer trail
+            decay: Math.random() * 0.005 + 0.004, // Slower decay (lasts ~3-4 seconds)
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.12
+            rotationSpeed: (Math.random() - 0.5) * 0.1
         };
     }
     
@@ -217,7 +212,7 @@ function initMouseTrail() {
     function updateParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 1. Update regular mouse/touch trail particles
+        // 1. Update falling stardust
         for (let i = globalParticles.length - 1; i >= 0; i--) {
             const p = globalParticles[i];
             p.x += p.vx;
@@ -232,7 +227,7 @@ function initMouseTrail() {
             }
         }
 
-        // 2. Draw the active drawing gesture path (glowing blue line)
+        // 2. Draw active drawing path (Mobile Only)
         if (activeGesturePath.length > 1) {
             ctx.save();
             ctx.strokeStyle = "rgba(0, 229, 255, 0.85)";
@@ -251,16 +246,16 @@ function initMouseTrail() {
             ctx.restore();
         }
 
-        // 3. Draw and update fading previous gesture paths
+        // 3. Draw fading gesture paths
         for (let j = fadingPaths.length - 1; j >= 0; j--) {
             const fp = fadingPaths[j];
-            fp.alpha -= 0.04; // Fade out quickly
+            fp.alpha -= 0.04;
             
             if (fp.alpha <= 0) {
                 fadingPaths.splice(j, 1);
             } else {
                 ctx.save();
-                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`; // turns pink as it fades
+                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`; // morphs pink as it fades
                 ctx.lineWidth = 8 * fp.alpha;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
@@ -283,22 +278,22 @@ function initMouseTrail() {
     updateParticles();
 }
 
-// Sparkle Explosion Burst
+// Sparkle Burst Creator (Drifts downwards)
 function spawnBurst(x, y) {
     const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
     const count = 18;
     for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
-        const speed = Math.random() * 4 + 3;
+        const speed = Math.random() * 4 + 2;
         globalParticles.push({
             x: x,
             y: y,
             vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed - 0.5,
+            vy: Math.sin(angle) * speed + 1.8,  // Gravity drift downwards
             size: Math.random() * 12 + 6,
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.015 + 0.012,
+            decay: Math.random() * 0.008 + 0.005, // Stays around longer
             rotation: Math.random() * Math.PI * 2,
             rotationSpeed: (Math.random() - 0.5) * 0.15
         });
@@ -316,7 +311,7 @@ function addGesturePoint(x, y) {
     const last = activeGesturePath[activeGesturePath.length - 1];
     if (last) {
         const dist = Math.hypot(x - last.x, y - last.y);
-        if (dist < 4) return; // ignore minor moves
+        if (dist < 4) return;
     }
     activeGesturePath.push({x, y});
 }
@@ -327,7 +322,6 @@ function endGesture() {
     
     if (activeGesturePath.length > 8) {
         analyzeGesture(activeGesturePath);
-        // Move to fading stack
         fadingPaths.push({
             path: activeGesturePath,
             alpha: 1
@@ -336,7 +330,49 @@ function endGesture() {
     activeGesturePath = [];
 }
 
-// Detect drawn "E" or "K"
+// Simplify gesture points to a list of direction changes
+function getDirectionSequence(path) {
+    const directions = [];
+    let lastDir = "";
+    
+    const filtered = [];
+    let lastPt = path[0];
+    filtered.push(lastPt);
+    for (let i = 1; i < path.length; i++) {
+        const dist = Math.hypot(path[i].x - lastPt.x, path[i].y - lastPt.y);
+        if (dist > 18) {
+            lastPt = path[i];
+            filtered.push(lastPt);
+        }
+    }
+    
+    if (filtered.length < 3) return [];
+    
+    for (let i = 1; i < filtered.length; i++) {
+        const dx = filtered[i].x - filtered[i-1].x;
+        const dy = filtered[i].y - filtered[i-1].y;
+        
+        let dir = "";
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        
+        if (angle >= -22.5 && angle < 22.5) dir = "R";
+        else if (angle >= 22.5 && angle < 67.5) dir = "DR";
+        else if (angle >= 67.5 && angle < 112.5) dir = "D";
+        else if (angle >= 112.5 && angle < 157.5) dir = "DL";
+        else if (angle >= 157.5 || angle < -157.5) dir = "L";
+        else if (angle >= -157.5 && angle < -112.5) dir = "UL";
+        else if (angle >= -112.5 && angle < -67.5) dir = "U";
+        else if (angle >= -67.5 && angle < -22.5) dir = "UR";
+        
+        if (dir !== lastDir) {
+            directions.push(dir);
+            lastDir = dir;
+        }
+    }
+    return directions;
+}
+
+// Selective drawn "E" or "K" recognizer
 function analyzeGesture(path) {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     path.forEach(p => {
@@ -349,51 +385,47 @@ function analyzeGesture(path) {
     const width = maxX - minX;
     const height = maxY - minY;
     
-    if (width < 60 || height < 60) return; // Ignore too small drawings
+    if (width < 60 || height < 60) return;
     
-    // Segment direction tracing
-    const segmentsCount = 4;
-    const dirs = [];
-    const ptsPerSeg = Math.floor(path.length / segmentsCount);
+    const dirs = getDirectionSequence(path);
+    if (dirs.length < 3) return;
     
-    for (let i = 0; i < segmentsCount; i++) {
-        const startPt = path[i * ptsPerSeg];
-        const endPt = path[Math.min((i + 1) * ptsPerSeg, path.length - 1)];
-        
-        const dx = endPt.x - startPt.x;
-        const dy = endPt.y - startPt.y;
-        
-        let dir = "";
-        if (Math.abs(dx) > Math.abs(dy) * 1.4) {
-            dir = dx > 0 ? "R" : "L";
-        } else if (Math.abs(dy) > Math.abs(dx) * 1.4) {
-            dir = dy > 0 ? "D" : "U";
-        } else {
-            dir = (dy > 0 ? "D" : "U") + (dx > 0 ? "R" : "L");
+    // Strict K sequence: Downwards spine (D/DL), diagonal upwards-right (U/UR/R), diagonal downwards-right (D/DR/R)
+    let isK = false;
+    const dIdx = dirs.findIndex(d => d.includes("D") && !d.includes("R"));
+    if (dIdx !== -1 && dIdx < dirs.length - 2) {
+        const urIdx = dirs.slice(dIdx).findIndex(d => d.includes("U") || d === "R");
+        if (urIdx !== -1) {
+            const drIdx = dirs.slice(dIdx + urIdx).findIndex(d => d.includes("D") || d === "R");
+            if (drIdx !== -1) {
+                isK = true;
+            }
         }
-        dirs.push(dir);
     }
     
-    // Heuristic 1: Loop detection (Cursive E)
-    const startPt = path[0];
-    const endPt = path[path.length - 1];
-    const startEndDist = Math.hypot(endPt.x - startPt.x, endPt.y - startPt.y);
-    let pathLength = 0;
-    for (let i = 1; i < path.length; i++) {
-        pathLength += Math.hypot(path[i].x - path[i-1].x, path[i].y - path[i-1].y);
+    // Strict E sequence (Capital E): starts top bar leftwards (L), goes down spine (D), goes bottom bar rightwards (R), moves up, middle bar rightwards (R)
+    let isE = false;
+    const l1 = dirs.findIndex(d => d.includes("L"));
+    if (l1 !== -1) {
+        const d1 = dirs.slice(l1).findIndex(d => d.includes("D"));
+        if (d1 !== -1) {
+            const r1 = dirs.slice(l1 + d1).findIndex(d => d.includes("R"));
+            if (r1 !== -1) {
+                const u1 = dirs.slice(l1 + d1 + r1).findIndex(d => d.includes("U"));
+                if (u1 !== -1) {
+                    const r2 = dirs.slice(l1 + d1 + r1 + u1).findIndex(d => d.includes("R"));
+                    if (r2 !== -1) {
+                        isE = true;
+                    }
+                }
+            }
+        }
     }
     
-    const isLoop = startEndDist < (width + height) * 0.45 && pathLength > 160;
-    
-    // Heuristic 2: K shape directions (Starts down, then goes up-right/right, then down-right/right)
-    const hasDownStart = dirs[0].includes("D");
-    const hasUpRight = dirs[1].includes("U") || dirs[1].includes("R") || dirs[2].includes("U") || dirs[2].includes("R");
-    const hasDownRight = dirs[2].includes("D") || dirs[2].includes("R") || dirs[3].includes("D") || dirs[3].includes("R");
-    
-    if (isLoop) {
-        triggerEasterEgg("erika");
-    } else if (hasDownStart && hasUpRight && hasDownRight) {
+    if (isK) {
         triggerEasterEgg("kayla");
+    } else if (isE) {
+        triggerEasterEgg("erika");
     }
 }
 
@@ -401,7 +433,6 @@ function analyzeGesture(path) {
    4. Bubble Letter Popping & Mobile Idle Animation
    ========================================================================== */
 
-// Synthesize Cute Bubble Pop Sound via Web Audio API
 function playPopSound() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -412,11 +443,11 @@ function playPopSound() {
         const gainNode = audioCtx.createGain();
         
         osc.type = "sine";
-        osc.frequency.setValueAtTime(140, audioCtx.currentTime); // start low
-        osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08); // slide up pitch rapidly
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08);
         
         gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // decay
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
         
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
@@ -424,7 +455,7 @@ function playPopSound() {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.12);
     } catch (e) {
-        console.log("Audio play blocked by browser gesture:", e);
+        console.log("Audio play blocked by browser:", e);
     }
 }
 
@@ -437,9 +468,7 @@ function initBubbleLetters() {
         letter.addEventListener("click", () => {
             if (letter.classList.contains("popped")) return;
             
-            // Play cute bubble pop sound!
             playPopSound();
-            
             letter.classList.add("popped");
             createPopVisualEffect(letter);
             
@@ -448,7 +477,7 @@ function initBubbleLetters() {
                 letter.style.transform = "scale(0)";
                 letter.style.opacity = "0";
                 
-                void letter.offsetWidth; // browser reflow
+                void letter.offsetWidth;
                 
                 letter.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s";
                 letter.style.transform = "scale(1)";
@@ -463,7 +492,7 @@ function initBubbleLetters() {
         });
     });
 
-    // Mobile Idle Wiggler (Gently expands/wiggles letters automatically on mobile)
+    // Mobile Idle Letter Hover Simulator
     const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     if (isMobile) {
         setInterval(() => {
@@ -578,9 +607,17 @@ function triggerEasterEgg(name) {
         }, 3500);
     }
     
-    const emojis = ["💖", "🌟", "🌈", "👑", "🧸", "🎨", "📿", "💍", "✨", "🎀", "💝", "🍬", "🍭", "🍩"];
-    const count = 35;
+    // DISTINCT EMOJI LISTS!
+    let emojis = [];
+    if (name === "kayla") {
+        // Kayla's Magic: Bubbly pink elements
+        emojis = ["💖", "🎀", "🧸", "💝", "🌸", "🍬", "🍭", "👑", "🦄", "⭐", "🍩", "📿"];
+    } else {
+        // Erika's Magic: Bright rainbows, diamonds, pets, creations
+        emojis = ["🌈", "🌟", "🎨", "💍", "💎", "💫", "🍕", "🐱", "🐶", "🧁", "🍩"];
+    }
     
+    const count = 35;
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const element = document.createElement("div");
@@ -815,7 +852,7 @@ function convertToHex(colorVal) {
 }
 
 /* ==========================================================================
-   8. Contact Form Submissions (Anti-Spam Verification: Ontario)
+   8. Contact Form Submissions (Anti-Spam Verification: Canada)
    ========================================================================== */
 
 function initContactForm() {
@@ -844,9 +881,9 @@ function initContactForm() {
             return;
         }
         
-        // 2. Custom Semantic Challenge Check: Ontario
+        // 2. Custom Semantic Challenge Check: Canada
         const challengeVal = challengeInput.value.trim().toLowerCase();
-        if (!challengeVal.includes("ontario")) {
+        if (!challengeVal.includes("canada")) {
             challengeError.classList.add("show");
             challengeInput.focus();
             
@@ -919,7 +956,6 @@ function initContactForm() {
         form.style.opacity = "0";
         form.style.pointerEvents = "none";
         
-        //Confetti on success
         createConfetti(document.getElementById("confetti-container"));
     }
 }
