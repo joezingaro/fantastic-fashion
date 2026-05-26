@@ -669,6 +669,9 @@ function initEasterEggs() {
         } else if (typedBuffer.endsWith("erika")) {
             triggerEasterEgg("erika");
             typedBuffer = "";
+        } else if (typedBuffer.endsWith("jojo")) {
+            triggerPopMasterReward();
+            typedBuffer = "";
         }
     }
 
@@ -715,6 +718,29 @@ function initEasterEggs() {
                 triggerEasterEgg("erika");
             }
             lastTapErika = now;
+        });
+    }
+
+    // Double Tap gold dots trigger (jojo cheat code for mobile/desktop)
+    const goldDots = document.querySelector(".gold-dots");
+    if (goldDots) {
+        let lastTapDots = 0;
+        
+        goldDots.addEventListener("click", () => {
+            const now = Date.now();
+            if (now - lastTapDots < 350) {
+                triggerPopMasterReward();
+            }
+            lastTapDots = now;
+        });
+        
+        goldDots.addEventListener("touchstart", (e) => {
+            const now = Date.now();
+            if (now - lastTapDots < 350) {
+                e.preventDefault();
+                triggerPopMasterReward();
+            }
+            lastTapDots = now;
         });
     }
 }
