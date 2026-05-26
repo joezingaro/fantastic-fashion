@@ -461,8 +461,7 @@ h2 {
         4px 6px 0px rgba(0, 0, 0, 0.15);
 }
 
-.pop-letter:hover,
-.pop-letter.hover-simulate {
+.pop-letter:hover {
     transform: scale(1.25) rotate(8deg);
     color: #ffffff;
     text-shadow: 
@@ -545,8 +544,7 @@ h2 {
         font-size: 2.1rem;
     }
     /* Optimize the text-shadow on mobile to remove the expensive Gaussian blur filter */
-    .pop-letter:hover,
-    .pop-letter.hover-simulate {
+    .pop-letter:hover {
         text-shadow: 
             3px 3px 0px var(--primary-color), 
             -3px -3px 0px var(--primary-color), 

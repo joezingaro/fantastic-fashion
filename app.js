@@ -322,22 +322,6 @@ function initBubbleLetters() {
             }, 1200);
         });
     });
-
-    // Mobile Idle Letter Hover Simulator
-    const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-    if (isMobile && letters.length > 0) {
-        setInterval(() => {
-            const randomIndex = Math.floor(Math.random() * letters.length);
-            const letter = letters[randomIndex];
-            
-            if (!letter.classList.contains("popped") && !letter.classList.contains("hover-simulate")) {
-                letter.classList.add("hover-simulate");
-                setTimeout(() => {
-                    letter.classList.remove("hover-simulate");
-                }, 850);
-            }
-        }, 1800); 
-    }
 }
 
 function createPopVisualEffect(element) {
