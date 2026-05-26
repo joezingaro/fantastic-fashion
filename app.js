@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fantastic Fashion Interactive Engine
+   Fantastic Fashion Interactive Engine - Mobile Performance Optimized
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -72,14 +72,16 @@ function initSparkleStars() {
     const overlay = document.getElementById("stars-overlay");
     if (!overlay) return;
     
-    const initialStarsCount = window.innerWidth < 768 ? 15 : 30;
+    // Spawn initial stars
+    const initialStarsCount = window.innerWidth < 768 ? 10 : 20; // Reduced count to save layout threads
     for (let i = 0; i < initialStarsCount; i++) {
         spawnStar(overlay, true);
     }
     
+    // Slower intervals
     setInterval(() => {
         spawnStar(overlay, false);
-    }, 1200);
+    }, 2000);
 }
 
 function spawnStar(container, isInitial = false) {
@@ -87,7 +89,7 @@ function spawnStar(container, isInitial = false) {
     const isDot = Math.random() > 0.6;
     star.className = isDot ? "sparkle-dot" : "sparkle-star";
     
-    let size = isDot ? Math.random() * 4 + 2 : Math.random() * 20 + 8;
+    let size = isDot ? Math.random() * 4 + 2 : Math.random() * 16 + 8;
     star.style.width = `${size}px`;
     star.style.height = `${size}px`;
     
@@ -106,20 +108,25 @@ function spawnStar(container, isInitial = false) {
     
     container.appendChild(star);
     
-    const maxCapacity = 60;
+    const maxCapacity = 40; // Prune earlier to keep layout lightweight
     if (container.children.length > maxCapacity) {
         container.removeChild(container.firstChild);
     }
 }
 
 /* ==========================================================================
-   3. Magic Wand Trail (Falling Stardust) & Touch Gesture Engine
+   3. Optimized Magic Wand Trail & Touch Gesture Engine
    ========================================================================== */
 
 let globalParticles = [];
 let activeGesturePath = [];
 let isDrawingGesture = false;
 let fadingPaths = [];
+
+// Throttling coordinates tracker
+let lastSpawnX = 0;
+let lastSpawnY = 0;
+const SPAWN_THRESHOLD = 18; // Only spawn a star if pointer moves 18px
 
 function initMouseTrail() {
     const canvas = document.getElementById("trail-canvas");
@@ -135,22 +142,27 @@ function initMouseTrail() {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     
-    // Spawn trail on mouse move (Desktop)
+    // Spawn mouse move trail on Desktop (Throttled)
     window.addEventListener("mousemove", (e) => {
-        for (let i = 0; i < 2; i++) {
+        const dist = Math.hypot(e.clientX - lastSpawnX, e.clientY - lastSpawnY);
+        if (dist > SPAWN_THRESHOLD) {
             globalParticles.push(createParticle(e.clientX, e.clientY));
+            lastSpawnX = e.clientX;
+            lastSpawnY = e.clientY;
         }
     });
 
-    // Touch events for drawing gestures ONLY on Mobile/Tablet
+    // Touch events for drawing gestures ONLY on Mobile/Tablet (Throttled)
     if (isTouchDevice) {
         window.addEventListener("touchstart", (e) => {
             if (e.touches.length > 0) {
                 const touch = e.touches[0];
-                if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box")) return;
+                if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box") || touch.target.closest(".pop-letter")) return;
                 
                 startGesture(touch.clientX, touch.clientY);
                 spawnBurst(touch.clientX, touch.clientY);
+                lastSpawnX = touch.clientX;
+                lastSpawnY = touch.clientY;
             }
         });
 
@@ -160,7 +172,13 @@ function initMouseTrail() {
                 if (isDrawingGesture) {
                     addGesturePoint(touch.clientX, touch.clientY);
                 }
-                globalParticles.push(createParticle(touch.clientX, touch.clientY));
+                
+                const dist = Math.hypot(touch.clientX - lastSpawnX, touch.clientY - lastSpawnY);
+                if (dist > SPAWN_THRESHOLD) {
+                    globalParticles.push(createParticle(touch.clientX, touch.clientY));
+                    lastSpawnX = touch.clientX;
+                    lastSpawnY = touch.clientY;
+                }
             }
         });
 
@@ -169,26 +187,26 @@ function initMouseTrail() {
         });
     }
 
-    // Spawn Burst on click
+    // Spawn Burst on click (Desktop) or tap
     window.addEventListener("click", (e) => {
-        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle")) return;
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle") || e.target.closest(".pop-letter")) return;
         spawnBurst(e.clientX, e.clientY);
     });
     
-    // Sparkle Particle Creator (Configured to drift DOWNWARDS and last longer)
+    // Sparkle Particle Creator (Drifts DOWNWARDS and stays optimized)
     function createParticle(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
         return {
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 2,
-            vy: Math.random() * 2.2 + 1.2,      // Positive vy causes stardust to fall DOWNWARDS
-            size: Math.random() * 12 + 6,       // Large stardust particles
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: Math.random() * 2 + 1,            // Drifts downwards
+            size: Math.random() * 10 + 6,
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.005 + 0.004, // Slower decay (lasts ~3-4 seconds)
+            decay: Math.random() * 0.01 + 0.008,   // Fades out in ~2 seconds to prevent list buildup
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.1
+            rotationSpeed: (Math.random() - 0.5) * 0.08
         };
     }
     
@@ -212,7 +230,13 @@ function initMouseTrail() {
     function updateParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 1. Update falling stardust
+        // Capping active particles to prevent mobile lag
+        const maxParticles = isTouchDevice ? 30 : 60;
+        if (globalParticles.length > maxParticles) {
+            globalParticles.splice(0, globalParticles.length - maxParticles);
+        }
+
+        // 1. Draw stardust particles
         for (let i = globalParticles.length - 1; i >= 0; i--) {
             const p = globalParticles[i];
             p.x += p.vx;
@@ -227,15 +251,13 @@ function initMouseTrail() {
             }
         }
 
-        // 2. Draw active drawing path (Mobile Only)
+        // 2. Draw active drawing path (No shadowBlur to preserve CPU/GPU cycles)
         if (activeGesturePath.length > 1) {
             ctx.save();
-            ctx.strokeStyle = "rgba(0, 229, 255, 0.85)";
-            ctx.lineWidth = 8;
+            ctx.strokeStyle = "rgba(0, 229, 255, 0.9)";
+            ctx.lineWidth = 6;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "#00e5ff";
             
             ctx.beginPath();
             ctx.moveTo(activeGesturePath[0].x, activeGesturePath[0].y);
@@ -246,21 +268,19 @@ function initMouseTrail() {
             ctx.restore();
         }
 
-        // 3. Draw fading gesture paths
+        // 3. Draw fading previous paths (No shadowBlur)
         for (let j = fadingPaths.length - 1; j >= 0; j--) {
             const fp = fadingPaths[j];
-            fp.alpha -= 0.04;
+            fp.alpha -= 0.05;
             
             if (fp.alpha <= 0) {
                 fadingPaths.splice(j, 1);
             } else {
                 ctx.save();
-                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`; // morphs pink as it fades
-                ctx.lineWidth = 8 * fp.alpha;
+                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`;
+                ctx.lineWidth = 6 * fp.alpha;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
-                ctx.shadowBlur = 10 * fp.alpha;
-                ctx.shadowColor = "#ff2a85";
                 
                 ctx.beginPath();
                 ctx.moveTo(fp.path[0].x, fp.path[0].y);
@@ -278,24 +298,24 @@ function initMouseTrail() {
     updateParticles();
 }
 
-// Sparkle Burst Creator (Drifts downwards)
+// Sparkle Burst (Optimized count for mobile)
 function spawnBurst(x, y) {
     const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-    const count = 18;
+    const count = 12; // Lowered to 12
     for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
-        const speed = Math.random() * 4 + 2;
+        const speed = Math.random() * 3 + 1.5;
         globalParticles.push({
             x: x,
             y: y,
             vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed + 1.8,  // Gravity drift downwards
-            size: Math.random() * 12 + 6,
+            vy: Math.sin(angle) * speed + 1.5, // Drifts down
+            size: Math.random() * 10 + 5,
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.008 + 0.005, // Stays around longer
+            decay: Math.random() * 0.012 + 0.008, // Prunes fast
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.15
+            rotationSpeed: (Math.random() - 0.5) * 0.12
         });
     }
 }
@@ -311,7 +331,7 @@ function addGesturePoint(x, y) {
     const last = activeGesturePath[activeGesturePath.length - 1];
     if (last) {
         const dist = Math.hypot(x - last.x, y - last.y);
-        if (dist < 4) return;
+        if (dist < 8) return; // ignore minor moves to save memory
     }
     activeGesturePath.push({x, y});
 }
@@ -320,7 +340,7 @@ function endGesture() {
     if (!isDrawingGesture) return;
     isDrawingGesture = false;
     
-    if (activeGesturePath.length > 8) {
+    if (activeGesturePath.length > 5) {
         analyzeGesture(activeGesturePath);
         fadingPaths.push({
             path: activeGesturePath,
@@ -330,7 +350,7 @@ function endGesture() {
     activeGesturePath = [];
 }
 
-// Simplify gesture points to a list of direction changes
+// Simplify path to swipe direction changes
 function getDirectionSequence(path) {
     const directions = [];
     let lastDir = "";
@@ -340,7 +360,7 @@ function getDirectionSequence(path) {
     filtered.push(lastPt);
     for (let i = 1; i < path.length; i++) {
         const dist = Math.hypot(path[i].x - lastPt.x, path[i].y - lastPt.y);
-        if (dist > 18) {
+        if (dist > 25) { // Spaced out more for clearer direction tracing
             lastPt = path[i];
             filtered.push(lastPt);
         }
@@ -372,7 +392,7 @@ function getDirectionSequence(path) {
     return directions;
 }
 
-// Selective drawn "E" or "K" recognizer
+// Strict gesture recognizer for capital E and K
 function analyzeGesture(path) {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     path.forEach(p => {
@@ -390,7 +410,7 @@ function analyzeGesture(path) {
     const dirs = getDirectionSequence(path);
     if (dirs.length < 3) return;
     
-    // Strict K sequence: Downwards spine (D/DL), diagonal upwards-right (U/UR/R), diagonal downwards-right (D/DR/R)
+    // Strict K: Starts D (down spine), then moves UR/R (up-right diagonal), then DR/R (down-right diagonal)
     let isK = false;
     const dIdx = dirs.findIndex(d => d.includes("D") && !d.includes("R"));
     if (dIdx !== -1 && dIdx < dirs.length - 2) {
@@ -403,7 +423,8 @@ function analyzeGesture(path) {
         }
     }
     
-    // Strict E sequence (Capital E): starts top bar leftwards (L), goes down spine (D), goes bottom bar rightwards (R), moves up, middle bar rightwards (R)
+    // Strict Capital E: Leftwards top bar (L), down spine (D), rightwards bottom bar (R), up, middle bar (R)
+    // Sequence must contain: L, D, R, U, R
     let isE = false;
     const l1 = dirs.findIndex(d => d.includes("L"));
     if (l1 !== -1) {
@@ -455,7 +476,7 @@ function playPopSound() {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.12);
     } catch (e) {
-        console.log("Audio play blocked by browser:", e);
+        console.log("Audio blocked by browser config:", e);
     }
 }
 
@@ -562,7 +583,7 @@ function createPopVisualEffect(element) {
 }
 
 /* ==========================================================================
-   5. Keyboard Easter Eggs (Kayla / Erika)
+   5. Easter Eggs & Subtitle Double-Taps (Kayla & Erika)
    ========================================================================== */
 
 function initEasterEggs() {
@@ -570,6 +591,7 @@ function initEasterEggs() {
     const keyTimeout = 2000;
     let timeoutId;
     
+    // Keyboard listener (Desktop)
     window.addEventListener("keydown", (e) => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
         
@@ -596,6 +618,55 @@ function initEasterEggs() {
             typedBuffer = "";
         }
     }
+
+    // Double Tap subtitle trigger (Alternative Mobile Easter Egg)
+    const subtitle = document.querySelector(".subtitle");
+    if (subtitle) {
+        // Change subtitle text to have clickable spans for Kayla and Erika
+        subtitle.innerHTML = `By <span class="owner-tap" id="tap-kayla" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4);">Kayla</span> and <span class="owner-tap" id="tap-erika" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4);">Erika</span>`;
+        
+        const tapKayla = document.getElementById("tap-kayla");
+        const tapErika = document.getElementById("tap-erika");
+        
+        // Support double tap / double click
+        let lastTapKayla = 0;
+        let lastTapErika = 0;
+        
+        tapKayla.addEventListener("click", () => {
+            const now = Date.now();
+            if (now - lastTapKayla < 350) {
+                triggerEasterEgg("kayla");
+            }
+            lastTapKayla = now;
+        });
+
+        tapErika.addEventListener("click", () => {
+            const now = Date.now();
+            if (now - lastTapErika < 350) {
+                triggerEasterEgg("erika");
+            }
+            lastTapErika = now;
+        });
+
+        // Touch event handlers for mobile responsive triggers
+        tapKayla.addEventListener("touchstart", (e) => {
+            const now = Date.now();
+            if (now - lastTapKayla < 350) {
+                e.preventDefault();
+                triggerEasterEgg("kayla");
+            }
+            lastTapKayla = now;
+        });
+
+        tapErika.addEventListener("touchstart", (e) => {
+            const now = Date.now();
+            if (now - lastTapErika < 350) {
+                e.preventDefault();
+                triggerEasterEgg("erika");
+            }
+            lastTapErika = now;
+        });
+    }
 }
 
 function triggerEasterEgg(name) {
@@ -607,17 +678,15 @@ function triggerEasterEgg(name) {
         }, 3500);
     }
     
-    // DISTINCT EMOJI LISTS!
+    // DISTINCT EMOJIS!
     let emojis = [];
     if (name === "kayla") {
-        // Kayla's Magic: Bubbly pink elements
         emojis = ["💖", "🎀", "🧸", "💝", "🌸", "🍬", "🍭", "👑", "🦄", "⭐", "🍩", "📿"];
     } else {
-        // Erika's Magic: Bright rainbows, diamonds, pets, creations
         emojis = ["🌈", "🌟", "🎨", "💍", "💎", "💫", "🍕", "🐱", "🐶", "🧁", "🍩"];
     }
     
-    const count = 35;
+    const count = 25; // Decreased count slightly to optimize layout render loops
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const element = document.createElement("div");
@@ -634,7 +703,7 @@ function triggerEasterEgg(name) {
             setTimeout(() => {
                 element.remove();
             }, duration * 1000);
-        }, i * 80);
+        }, i * 100);
     }
 }
 
@@ -674,7 +743,7 @@ function createConfetti(container) {
     container.innerHTML = "";
     
     const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-    const count = 45;
+    const count = 30; // Decreased count to keep CPU efficient
     
     for (let i = 0; i < count; i++) {
         const piece = document.createElement("div");
@@ -683,7 +752,7 @@ function createConfetti(container) {
         piece.style.left = `${Math.random() * 80 + 10}%`;
         piece.style.top = `-10px`;
         piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 80}px`);
-        piece.style.animationDelay = `${Math.random() * 0.6}s`;
+        piece.style.animationDelay = `${Math.random() * 0.5}s`;
         piece.style.animationDuration = `${Math.random() * 1.5 + 1.2}s`;
         
         const size = Math.random() * 6 + 6;
