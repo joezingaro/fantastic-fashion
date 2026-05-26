@@ -54,7 +54,8 @@
                     </a>
                     <!-- Pop Counter -->
                     <div id="pop-counter-container" class="pop-counter-container">
-                        🎈 Letters Popped: <span id="pop-count-number" class="pop-count-num">0</span>/100
+                        <div>🎈 Letters Popped: <span id="pop-count-number" class="pop-count-num">0</span>/100</div>
+                        <div id="active-powerups-list" class="active-powerups-list"></div>
                     </div>
                 </div>
             </div>
@@ -246,16 +247,36 @@
 
     <!-- Pop Master Modal -->
     <div id="pop-master-modal" class="modal-overlay">
-        <div class="modal-card">
+        <div class="modal-card" style="max-width: 500px;">
             <div class="modal-emoji">👑🏆💖</div>
             <h2>🎉 POP MASTER UNLOCKED! 🎉</h2>
-            <p>Wow! You popped <strong>100 bubble letters</strong>! You are officially a Fantastic Fashion Superstar! ⭐</p>
-            <div class="modal-code-box">
-                <span>Your Secret Reward Code:</span>
-                <strong id="reward-code">SUPERPOP</strong>
+            <p>Wow! You popped <strong>100 bubble letters</strong>! Select a magical powerup to activate on the website:</p>
+            
+            <div class="powerup-options">
+                <button class="powerup-btn" data-powerup="rainbow">
+                    <span class="powerup-icon">🌈</span>
+                    <div class="powerup-info">
+                        <strong>Rainbow Shimmer</strong>
+                        <span>Bubble letters cycle through beautiful rainbow colors!</span>
+                    </div>
+                </button>
+                <button class="powerup-btn" data-powerup="xylophone">
+                    <span class="powerup-icon">🎹</span>
+                    <div class="powerup-info">
+                        <strong>Xylophone Mode</strong>
+                        <span>Each bubble letter plays a different musical note!</span>
+                    </div>
+                </button>
+                <button class="powerup-btn" data-powerup="supertrail">
+                    <span class="powerup-icon">✨</span>
+                    <div class="powerup-info">
+                        <strong>Super Star Trail</strong>
+                        <span>Your pointer trail grows double-sized and lasts longer!</span>
+                    </div>
+                </button>
             </div>
-            <p class="modal-note">Tell Kayla and Erika this code to get a free surprise gift with your order! 🎁</p>
-            <button id="close-pop-master" class="modal-btn">Hooray! 🥳</button>
+            
+            <p class="modal-note">Unlocking a powerup resets your counter so you can play again! 🎁</p>
         </div>
     </div>
 

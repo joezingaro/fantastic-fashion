@@ -1542,3 +1542,84 @@ footer p:first-child {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(255, 42, 133, 0.4);
 }
+
+/* Powerup Modal Elements */
+.powerup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.powerup-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
+    border: 3px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    font-family: inherit;
+    width: 100%;
+}
+
+.powerup-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 12px rgba(255, 42, 133, 0.15);
+}
+
+.powerup-icon {
+    font-size: 2.2rem;
+}
+
+.powerup-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.powerup-info strong {
+    font-size: 1.1rem;
+    color: #030825;
+}
+
+.powerup-info span {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.25;
+}
+
+.active-powerups-list {
+    font-size: 0.85rem;
+    color: #ffffff;
+    opacity: 0.95;
+    font-family: var(--font-family);
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 16px;
+    display: none;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.active-powerups-list.has-active {
+    display: inline-block;
+}
+
+/* Rainbow Shimmer Mode Animation */
+.rainbow-shimmer-active .pop-letter {
+    animation: rainbow-shimmer-title 6s linear infinite;
+}
+
+@keyframes rainbow-shimmer-title {
+    0%, 100% { color: #ff2a85; }
+    20% { color: #ff9d00; }
+    40% { color: #ffff00; }
+    60% { color: #00e5ff; }
+    80% { color: #b026ff; }
+}

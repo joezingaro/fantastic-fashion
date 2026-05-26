@@ -164,8 +164,8 @@ function initMouseTrail() {
     function addParticle(p) {
         globalParticles.push(p);
         
-        // Cap particles array to keep mobile rendering fast
-        const maxParticles = 25;
+        // Cap particles array to keep mobile rendering fast (longer trail if Super Trail powerup is active)
+        const maxParticles = (typeof activePowerups !== 'undefined' && activePowerups.supertrail) ? 60 : 25;
         if (globalParticles.length > maxParticles) {
             globalParticles.shift();
         }
@@ -177,20 +177,22 @@ function initMouseTrail() {
         }
     }
 
-    // Sparkle Particle Creator (REVERTED TO ORIGINAL: floats upwards, small size, fast decay)
+    // Sparkle Particle Creator (Dynamically adjusts if Super Star Trail powerup is active)
     function createParticle(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
+        const isSuper = activePowerups && activePowerups.supertrail;
+        
         return {
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 2.5,
-            vy: (Math.random() - 0.5) * 2.5 - 1.5, // Floats UPWARDS quickly
-            size: Math.random() * 8 + 4,          // Original small size
+            vx: (Math.random() - 0.5) * (isSuper ? 5 : 2.5),
+            vy: (Math.random() - 0.5) * (isSuper ? 5 : 2.5) - (isSuper ? 2.5 : 1.5), 
+            size: isSuper ? Math.random() * 16 + 10 : Math.random() * 8 + 4,          
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.022 + 0.018, // Original fast decay (fades in ~0.5s)
+            decay: isSuper ? Math.random() * 0.009 + 0.007 : Math.random() * 0.022 + 0.018, 
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.1
+            rotationSpeed: (Math.random() - 0.5) * (isSuper ? 0.25 : 0.1)
         };
     }
     
@@ -267,6 +269,11 @@ function initMouseTrail() {
 let globalAudioCtx = null;
 let popCount = 0;
 let popCounterShown = false;
+let activePowerups = {
+    rainbow: false,
+    xylophone: false,
+    supertrail: false
+};
 
 function playPopSound() {
     try {
@@ -301,6 +308,49 @@ function playPopSound() {
     }
 }
 
+function playXylophoneSound(index) {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        
+        if (!globalAudioCtx) {
+            globalAudioCtx = new AudioCtx();
+        }
+        
+        if (globalAudioCtx.state === "suspended") {
+            globalAudioCtx.resume();
+        }
+        
+        // Major scale frequencies starting at C5 (523.25 Hz)
+        // 16 letters total: C5, D5, E5, F5, G5, A5, B5, C6, D6, E6, F6, G6, A6, B6, C7, D7
+        const majorScale = [
+            523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, // C5 to B5
+            1046.50, 1174.66, 1318.51, 1396.91, 1567.98, 1760.00, 1975.53, // C6 to B6
+            2093.00, 2349.32 // C7 to D7
+        ];
+        
+        const freq = majorScale[index % majorScale.length];
+        
+        const osc = globalAudioCtx.createOscillator();
+        const gainNode = globalAudioCtx.createGain();
+        
+        // Sweet, resonant sine wave note that rings slightly like a toy xylophone bar
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, globalAudioCtx.currentTime);
+        
+        gainNode.gain.setValueAtTime(0.2, globalAudioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, globalAudioCtx.currentTime + 0.3); // longer ring decay
+        
+        osc.connect(gainNode);
+        gainNode.connect(globalAudioCtx.destination);
+        
+        osc.start();
+        osc.stop(globalAudioCtx.currentTime + 0.35);
+    } catch (e) {
+        console.log("Xylophone play error:", e);
+    }
+}
+
 function playFanfareSound() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -316,7 +366,7 @@ function playFanfareSound() {
         
         const now = globalAudioCtx.currentTime;
         
-        // Ascending chime notes: C5, E5, G5, C6
+        // Ascending chime notes C5, E5, G5, C6
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
             const osc = globalAudioCtx.createOscillator();
@@ -369,6 +419,41 @@ function triggerPopMasterReward() {
     playFanfareSound();
     triggerMassiveEmojiRain();
     
+    // Style/disable buttons for powerups that are already active
+    const powerupButtons = document.querySelectorAll(".powerup-btn");
+    let allUnlocked = true;
+    powerupButtons.forEach(btn => {
+        const powerup = btn.getAttribute("data-powerup");
+        if (activePowerups[powerup]) {
+            btn.style.opacity = "0.4";
+            btn.style.pointerEvents = "none";
+            const btnStrong = btn.querySelector("strong");
+            if (btnStrong && !btnStrong.innerText.includes("Active")) {
+                btnStrong.innerText += " (Active! ✅)";
+            }
+        } else {
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "auto";
+            allUnlocked = false;
+        }
+    });
+    
+    // If all three are already unlocked, reset them all so they can re-unlock!
+    if (allUnlocked) {
+        powerupButtons.forEach(btn => {
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "auto";
+            const btnStrong = btn.querySelector("strong");
+            if (btnStrong) {
+                btnStrong.innerText = btnStrong.innerText.replace(" (Active! ✅)", "");
+            }
+            const powerup = btn.getAttribute("data-powerup");
+            activePowerups[powerup] = false;
+        });
+        document.documentElement.classList.remove("rainbow-shimmer-active");
+        updatePowerupsUI();
+    }
+    
     const modal = document.getElementById("pop-master-modal");
     if (modal) {
         modal.classList.add("show");
@@ -393,7 +478,8 @@ function triggerMassiveEmojiRain() {
             element.style.transform = `scale(${Math.random() * 0.8 + 0.8})`;
             element.style.zIndex = "2100";
             
-            const duration = Math.random() * 2.5 + 2;
+            // Twice as long (4s to 9s fall duration)
+            const duration = Math.random() * 5 + 4;
             element.style.animationDuration = `${duration}s`;
             
             document.body.appendChild(element);
@@ -405,16 +491,55 @@ function triggerMassiveEmojiRain() {
     }
 }
 
+function activatePowerup(powerup) {
+    activePowerups[powerup] = true;
+    
+    if (powerup === "rainbow") {
+        document.documentElement.classList.add("rainbow-shimmer-active");
+    }
+    
+    updatePowerupsUI();
+}
+
+function updatePowerupsUI() {
+    const listEl = document.getElementById("active-powerups-list");
+    if (!listEl) return;
+    
+    const activeNames = [];
+    if (activePowerups.rainbow) activeNames.push("🌈 Rainbow");
+    if (activePowerups.xylophone) activeNames.push("🎹 Xylophone");
+    if (activePowerups.supertrail) activeNames.push("✨ Super Trail");
+    
+    if (activeNames.length > 0) {
+        listEl.innerText = `Powerups Active: ${activeNames.join(" | ")}`;
+        listEl.classList.add("has-active");
+    } else {
+        listEl.classList.remove("has-active");
+    }
+}
+
+function resetPopCount() {
+    popCount = 0;
+    const counterNumber = document.getElementById("pop-count-number");
+    if (counterNumber) {
+        counterNumber.innerText = popCount;
+    }
+}
+
 function initBubbleLetters() {
     const letters = document.querySelectorAll(".pop-letter");
     
-    letters.forEach(letter => {
+    letters.forEach((letter, idx) => {
         letter.addEventListener("mousedown", (e) => e.preventDefault());
         
         letter.addEventListener("click", () => {
             if (letter.classList.contains("popped")) return;
             
-            playPopSound();
+            if (activePowerups && activePowerups.xylophone) {
+                playXylophoneSound(idx);
+            } else {
+                playPopSound();
+            }
             letter.classList.add("popped");
             createPopVisualEffect(letter);
             
@@ -441,15 +566,24 @@ function initBubbleLetters() {
         });
     });
 
-    // Modal Close handler
-    const modal = document.getElementById("pop-master-modal");
-    const closeModalBtn = document.getElementById("close-pop-master");
-    if (modal && closeModalBtn) {
-        closeModalBtn.addEventListener("click", () => {
-            modal.classList.remove("show");
+    // Close achievement modal / powerup buttons triggers
+    const powerupButtons = document.querySelectorAll(".powerup-btn");
+    powerupButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const powerup = btn.getAttribute("data-powerup");
+            activatePowerup(powerup);
+            
+            // Close the modal
+            const modal = document.getElementById("pop-master-modal");
+            if (modal) modal.classList.remove("show");
+            
+            // Reset counter
+            resetPopCount();
+            
+            // Show confetti
             createConfetti(document.getElementById("confetti-container"));
         });
-    }
+    });
 }
 
 function createPopVisualEffect(element) {
