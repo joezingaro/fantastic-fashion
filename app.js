@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ==========================================================================
-   1. Theme Initialization
+   1. Theme Initialization & Application
    ========================================================================== */
 
 const DEFAULT_THEME = {
@@ -72,13 +72,11 @@ function initSparkleStars() {
     const overlay = document.getElementById("stars-overlay");
     if (!overlay) return;
     
-    // Spawn initial batch of stars
     const initialStarsCount = window.innerWidth < 768 ? 15 : 30;
     for (let i = 0; i < initialStarsCount; i++) {
         spawnStar(overlay, true);
     }
     
-    // Periodically spawn a new star to keep it dynamic
     setInterval(() => {
         spawnStar(overlay, false);
     }, 1200);
@@ -86,36 +84,28 @@ function initSparkleStars() {
 
 function spawnStar(container, isInitial = false) {
     const star = document.createElement("div");
-    
-    // Decide if it is a polygon star or a round dot
     const isDot = Math.random() > 0.6;
     star.className = isDot ? "sparkle-dot" : "sparkle-star";
     
-    // Random sizes
-    let size = isDot ? Math.random() * 4 + 2 : Math.random() * 20 + 8; // Stars 8-28px, Dots 2-6px
+    let size = isDot ? Math.random() * 4 + 2 : Math.random() * 20 + 8;
     star.style.width = `${size}px`;
     star.style.height = `${size}px`;
     
-    // Random positions
     star.style.left = `${Math.random() * 100}%`;
     star.style.top = `${Math.random() * 100}%`;
     
-    // Random animation delays and durations
     if (isInitial) {
-        // Stagger delays so they don't fade in/out at the same time
         const delay = -Math.random() * 4;
         star.style.animationDelay = `${delay}s`;
     } else {
         star.style.animationDelay = `0s`;
     }
     
-    const duration = Math.random() * 3 + 3; // 3 to 6 seconds
+    const duration = Math.random() * 3 + 3;
     star.style.animationDuration = `${duration}s`;
     
-    // Append
     container.appendChild(star);
     
-    // Cleanup old stars that are not initial (stars run infinite animations, but we prune overflow)
     const maxCapacity = 60;
     if (container.children.length > maxCapacity) {
         container.removeChild(container.firstChild);
@@ -123,17 +113,19 @@ function spawnStar(container, isInitial = false) {
 }
 
 /* ==========================================================================
-   3. Magic Wand Mouse Trail Canvas
+   3. Magic Wand Trail & Touch Gesture Engine
    ========================================================================== */
+
+let globalParticles = [];
+let activeGesturePath = [];
+let isDrawingGesture = false;
+let fadingPaths = [];
 
 function initMouseTrail() {
     const canvas = document.getElementById("trail-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     
-    let particles = [];
-    
-    // Handle resizing
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -141,56 +133,77 @@ function initMouseTrail() {
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     
-    // Track mouse
+    // Spawn mouse move trail
     window.addEventListener("mousemove", (e) => {
-        // Spawn 2 particles per mouse move
+        if (isDrawingGesture) {
+            addGesturePoint(e.clientX, e.clientY);
+        }
         for (let i = 0; i < 2; i++) {
-            particles.push(createParticle(e.clientX, e.clientY));
+            globalParticles.push(createParticle(e.clientX, e.clientY));
+        }
+    });
+
+    // Touch events for drawing & trails on mobile
+    window.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            // Don't draw gesture if tapping form fields or customizer
+            if (touch.target.tagName === "INPUT" || touch.target.tagName === "TEXTAREA" || touch.target.tagName === "BUTTON" || touch.target.closest(".customizer-panel") || touch.target.closest(".customizer-toggle") || touch.target.closest(".product-card") || touch.target.closest("#gift-box")) return;
+            
+            startGesture(touch.clientX, touch.clientY);
+            spawnBurst(touch.clientX, touch.clientY);
         }
     });
 
     window.addEventListener("touchmove", (e) => {
         if (e.touches.length > 0) {
             const touch = e.touches[0];
-            particles.push(createParticle(touch.clientX, touch.clientY));
+            if (isDrawingGesture) {
+                addGesturePoint(touch.clientX, touch.clientY);
+            }
+            globalParticles.push(createParticle(touch.clientX, touch.clientY));
         }
     });
+
+    window.addEventListener("touchend", () => {
+        endGesture();
+    });
+
+    // Mouse drag support for drawing on desktop (hold click to draw)
+    window.addEventListener("mousedown", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON" || e.target.closest(".customizer-panel") || e.target.closest(".customizer-toggle") || e.target.closest(".product-card") || e.target.closest("#gift-box")) return;
+        startGesture(e.clientX, e.clientY);
+        spawnBurst(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mouseup", () => {
+        endGesture();
+    });
     
+    // Sparkle Particle Creator
     function createParticle(x, y) {
-        // Random bright cute colors
-        const colors = [
-            "#ff2a85", // Pink
-            "#00e5ff", // Turquoise
-            "#ffff00", // Yellow
-            "#ffd700", // Gold
-            "#ff9d00", // Orange
-            "#b026ff"  // Purple
-        ];
-        
+        const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
         return {
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 2.5,
-            vy: (Math.random() - 0.5) * 2.5 - 1.5, // Float upwards
-            size: Math.random() * 8 + 4,
+            vx: (Math.random() - 0.5) * 3,
+            vy: (Math.random() - 0.5) * 3 - 1.2,
+            size: Math.random() * 12 + 6, // Grown particle size
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.02 + 0.015,
+            decay: Math.random() * 0.012 + 0.008, // Fades slower for a longer trail
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.1
+            rotationSpeed: (Math.random() - 0.5) * 0.12
         };
     }
     
-    // Draw 4-pointed diamond sparkle star on canvas
     function drawSparkle(ctx, x, y, size, rotation, color, alpha) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(rotation);
         ctx.globalAlpha = alpha;
         ctx.fillStyle = color;
-        
         ctx.beginPath();
-        // Drawing a diamond star shape
         ctx.moveTo(0, -size);
         ctx.quadraticCurveTo(0, 0, size, 0);
         ctx.quadraticCurveTo(0, 0, 0, size);
@@ -198,24 +211,69 @@ function initMouseTrail() {
         ctx.quadraticCurveTo(0, 0, 0, -size);
         ctx.closePath();
         ctx.fill();
-        
         ctx.restore();
     }
     
     function updateParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
+        // 1. Update regular mouse/touch trail particles
+        for (let i = globalParticles.length - 1; i >= 0; i--) {
+            const p = globalParticles[i];
             p.x += p.vx;
             p.y += p.vy;
             p.alpha -= p.decay;
             p.rotation += p.rotationSpeed;
             
             if (p.alpha <= 0) {
-                particles.splice(i, 1);
+                globalParticles.splice(i, 1);
             } else {
                 drawSparkle(ctx, p.x, p.y, p.size, p.rotation, p.color, p.alpha);
+            }
+        }
+
+        // 2. Draw the active drawing gesture path (glowing blue line)
+        if (activeGesturePath.length > 1) {
+            ctx.save();
+            ctx.strokeStyle = "rgba(0, 229, 255, 0.85)";
+            ctx.lineWidth = 8;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00e5ff";
+            
+            ctx.beginPath();
+            ctx.moveTo(activeGesturePath[0].x, activeGesturePath[0].y);
+            for (let i = 1; i < activeGesturePath.length; i++) {
+                ctx.lineTo(activeGesturePath[i].x, activeGesturePath[i].y);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 3. Draw and update fading previous gesture paths
+        for (let j = fadingPaths.length - 1; j >= 0; j--) {
+            const fp = fadingPaths[j];
+            fp.alpha -= 0.04; // Fade out quickly
+            
+            if (fp.alpha <= 0) {
+                fadingPaths.splice(j, 1);
+            } else {
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 42, 133, ${fp.alpha})`; // turns pink as it fades
+                ctx.lineWidth = 8 * fp.alpha;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.shadowBlur = 10 * fp.alpha;
+                ctx.shadowColor = "#ff2a85";
+                
+                ctx.beginPath();
+                ctx.moveTo(fp.path[0].x, fp.path[0].y);
+                for (let k = 1; k < fp.path.length; k++) {
+                    ctx.lineTo(fp.path[k].x, fp.path[k].y);
+                }
+                ctx.stroke();
+                ctx.restore();
             }
         }
         
@@ -225,51 +283,204 @@ function initMouseTrail() {
     updateParticles();
 }
 
+// Sparkle Explosion Burst
+function spawnBurst(x, y) {
+    const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
+    const count = 18;
+    for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+        const speed = Math.random() * 4 + 3;
+        globalParticles.push({
+            x: x,
+            y: y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 0.5,
+            size: Math.random() * 12 + 6,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            alpha: 1,
+            decay: Math.random() * 0.015 + 0.012,
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.15
+        });
+    }
+}
+
+// Drawing Gestures Engine
+function startGesture(x, y) {
+    activeGesturePath = [{x, y}];
+    isDrawingGesture = true;
+}
+
+function addGesturePoint(x, y) {
+    if (!isDrawingGesture) return;
+    const last = activeGesturePath[activeGesturePath.length - 1];
+    if (last) {
+        const dist = Math.hypot(x - last.x, y - last.y);
+        if (dist < 4) return; // ignore minor moves
+    }
+    activeGesturePath.push({x, y});
+}
+
+function endGesture() {
+    if (!isDrawingGesture) return;
+    isDrawingGesture = false;
+    
+    if (activeGesturePath.length > 8) {
+        analyzeGesture(activeGesturePath);
+        // Move to fading stack
+        fadingPaths.push({
+            path: activeGesturePath,
+            alpha: 1
+        });
+    }
+    activeGesturePath = [];
+}
+
+// Detect drawn "E" or "K"
+function analyzeGesture(path) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    path.forEach(p => {
+        if (p.x < minX) minX = p.x;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+    });
+    
+    const width = maxX - minX;
+    const height = maxY - minY;
+    
+    if (width < 60 || height < 60) return; // Ignore too small drawings
+    
+    // Segment direction tracing
+    const segmentsCount = 4;
+    const dirs = [];
+    const ptsPerSeg = Math.floor(path.length / segmentsCount);
+    
+    for (let i = 0; i < segmentsCount; i++) {
+        const startPt = path[i * ptsPerSeg];
+        const endPt = path[Math.min((i + 1) * ptsPerSeg, path.length - 1)];
+        
+        const dx = endPt.x - startPt.x;
+        const dy = endPt.y - startPt.y;
+        
+        let dir = "";
+        if (Math.abs(dx) > Math.abs(dy) * 1.4) {
+            dir = dx > 0 ? "R" : "L";
+        } else if (Math.abs(dy) > Math.abs(dx) * 1.4) {
+            dir = dy > 0 ? "D" : "U";
+        } else {
+            dir = (dy > 0 ? "D" : "U") + (dx > 0 ? "R" : "L");
+        }
+        dirs.push(dir);
+    }
+    
+    // Heuristic 1: Loop detection (Cursive E)
+    const startPt = path[0];
+    const endPt = path[path.length - 1];
+    const startEndDist = Math.hypot(endPt.x - startPt.x, endPt.y - startPt.y);
+    let pathLength = 0;
+    for (let i = 1; i < path.length; i++) {
+        pathLength += Math.hypot(path[i].x - path[i-1].x, path[i].y - path[i-1].y);
+    }
+    
+    const isLoop = startEndDist < (width + height) * 0.45 && pathLength > 160;
+    
+    // Heuristic 2: K shape directions (Starts down, then goes up-right/right, then down-right/right)
+    const hasDownStart = dirs[0].includes("D");
+    const hasUpRight = dirs[1].includes("U") || dirs[1].includes("R") || dirs[2].includes("U") || dirs[2].includes("R");
+    const hasDownRight = dirs[2].includes("D") || dirs[2].includes("R") || dirs[3].includes("D") || dirs[3].includes("R");
+    
+    if (isLoop) {
+        triggerEasterEgg("erika");
+    } else if (hasDownStart && hasUpRight && hasDownRight) {
+        triggerEasterEgg("kayla");
+    }
+}
+
 /* ==========================================================================
-   4. Bubble Letter pop & return micro-interaction
+   4. Bubble Letter Popping & Mobile Idle Animation
    ========================================================================== */
+
+// Synthesize Cute Bubble Pop Sound via Web Audio API
+function playPopSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        
+        const audioCtx = new AudioCtx();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime); // start low
+        osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08); // slide up pitch rapidly
+        
+        gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // decay
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+    } catch (e) {
+        console.log("Audio play blocked by browser gesture:", e);
+    }
+}
 
 function initBubbleLetters() {
     const letters = document.querySelectorAll(".pop-letter");
     
     letters.forEach(letter => {
-        // Prevent click drag selection
         letter.addEventListener("mousedown", (e) => e.preventDefault());
         
         letter.addEventListener("click", () => {
             if (letter.classList.contains("popped")) return;
             
-            // Add pop animation
-            letter.classList.add("popped");
+            // Play cute bubble pop sound!
+            playPopSound();
             
-            // Create a small burst of floating colorful micro-particles when it pops
+            letter.classList.add("popped");
             createPopVisualEffect(letter);
             
-            // Return letter after 1.2 seconds
             setTimeout(() => {
                 letter.classList.remove("popped");
-                // Trigger a nice wiggle scale-in effect
                 letter.style.transform = "scale(0)";
                 letter.style.opacity = "0";
                 
-                // Forces browser reflow
-                void letter.offsetWidth;
+                void letter.offsetWidth; // browser reflow
                 
-                // Smoothly fade back in
                 letter.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s";
                 letter.style.transform = "scale(1)";
                 letter.style.opacity = "1";
                 
-                // Clear inline transition after animation completes
                 setTimeout(() => {
                     letter.style.transition = "";
                     letter.style.transform = "";
                     letter.style.opacity = "";
                 }, 400);
-                
             }, 1200);
         });
     });
+
+    // Mobile Idle Wiggler (Gently expands/wiggles letters automatically on mobile)
+    const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    if (isMobile) {
+        setInterval(() => {
+            const letters = document.querySelectorAll(".pop-letter");
+            if (letters.length === 0) return;
+            
+            const randomIndex = Math.floor(Math.random() * letters.length);
+            const letter = letters[randomIndex];
+            
+            if (!letter.classList.contains("popped") && !letter.classList.contains("hover-simulate")) {
+                letter.classList.add("hover-simulate");
+                setTimeout(() => {
+                    letter.classList.remove("hover-simulate");
+                }, 850);
+            }
+        }, 1400);
+    }
 }
 
 function createPopVisualEffect(element) {
@@ -277,7 +488,6 @@ function createPopVisualEffect(element) {
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
     
-    // Spawn 8 tiny popping circle particles
     for (let i = 0; i < 8; i++) {
         const particle = document.createElement("div");
         particle.style.position = "fixed";
@@ -287,13 +497,11 @@ function createPopVisualEffect(element) {
         particle.style.height = "10px";
         particle.style.borderRadius = "50%";
         
-        // Random pretty color
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#a855f7"];
         particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         particle.style.pointerEvents = "none";
         particle.style.zIndex = "1000";
         
-        // Random velocity direction
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 5 + 3;
         const vx = Math.cos(angle) * speed;
@@ -330,24 +538,18 @@ function createPopVisualEffect(element) {
 
 function initEasterEggs() {
     let typedBuffer = "";
-    const keyTimeout = 2000; // Reset typing tracker after 2 seconds of inactivity
+    const keyTimeout = 2000;
     let timeoutId;
     
     window.addEventListener("keydown", (e) => {
-        // Ignore inputs if typed in form fields
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
         
         clearTimeout(timeoutId);
-        
-        // Accumulate keys (alphabetic only)
         if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
             typedBuffer += e.key.toLowerCase();
-            
-            // Keep buffer reasonable length
             if (typedBuffer.length > 15) {
                 typedBuffer = typedBuffer.substring(typedBuffer.length - 15);
             }
-            
             checkBuffer();
         }
         
@@ -365,43 +567,37 @@ function initEasterEggs() {
             typedBuffer = "";
         }
     }
+}
+
+function triggerEasterEgg(name) {
+    const banner = document.getElementById(`banner-${name}`);
+    if (banner) {
+        banner.classList.add("show");
+        setTimeout(() => {
+            banner.classList.remove("show");
+        }, 3500);
+    }
     
-    function triggerEasterEgg(name) {
-        // 1. Show floating card banner
-        const banner = document.getElementById(`banner-${name}`);
-        if (banner) {
-            banner.classList.add("show");
+    const emojis = ["💖", "🌟", "🌈", "👑", "🧸", "🎨", "📿", "💍", "✨", "🎀", "💝", "🍬", "🍭", "🍩"];
+    const count = 35;
+    
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const element = document.createElement("div");
+            element.className = "rain-emoji";
+            element.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            element.style.left = `${Math.random() * 95}%`;
+            element.style.transform = `scale(${Math.random() * 0.6 + 0.7})`;
+            
+            const duration = Math.random() * 2 + 2;
+            element.style.animationDuration = `${duration}s`;
+            
+            document.body.appendChild(element);
+            
             setTimeout(() => {
-                banner.classList.remove("show");
-            }, 3500);
-        }
-        
-        // 2. Spawn emoji shower
-        const emojis = ["💖", "🌟", "🌈", "👑", "🧸", "🎨", "📿", "💍", "✨", "🎀", "💝", "🍬", "🍭", "🍩"];
-        const count = 35;
-        
-        for (let i = 0; i < count; i++) {
-            setTimeout(() => {
-                const element = document.createElement("div");
-                element.className = "rain-emoji";
-                element.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                
-                // Random position & scale
-                element.style.left = `${Math.random() * 95}%`;
-                element.style.transform = `scale(${Math.random() * 0.6 + 0.7})`;
-                
-                // Random animation durations
-                const duration = Math.random() * 2 + 2; // 2 to 4 seconds
-                element.style.animationDuration = `${duration}s`;
-                
-                document.body.appendChild(element);
-                
-                // Cleanup after falls off screen
-                setTimeout(() => {
-                    element.remove();
-                }, duration * 1000);
-            }, i * 80); // Stagger spawn times
-        }
+                element.remove();
+            }, duration * 1000);
+        }, i * 80);
     }
 }
 
@@ -411,44 +607,28 @@ function initEasterEggs() {
 
 function initGiftCoupon() {
     const giftBox = document.getElementById("gift-box");
+    const teaserBox = document.querySelector(".coupon-teaser-box");
     const couponReveal = document.getElementById("coupon-reveal");
     const closeCoupon = document.getElementById("close-coupon");
-    const copyBtn = document.getElementById("copy-code-btn");
     
     if (!giftBox || !couponReveal) return;
     
     giftBox.addEventListener("click", () => {
-        // Play click wiggles
+        playPopSound();
         giftBox.style.animation = "gift-wiggle-fast 0.2s 3 linear";
         
         setTimeout(() => {
             giftBox.style.animation = "";
+            teaserBox.classList.add("revealed");
             couponReveal.classList.add("show");
             
-            // Trigger local confetti shower inside the card
             createConfetti(document.getElementById("confetti-container"));
         }, 600);
     });
     
     closeCoupon.addEventListener("click", () => {
         couponReveal.classList.remove("show");
-    });
-    
-    copyBtn.addEventListener("click", () => {
-        const codeText = "FANTASTIC5";
-        
-        navigator.clipboard.writeText(codeText).then(() => {
-            const originalText = copyBtn.innerText;
-            copyBtn.innerText = "Copied! 🎉";
-            copyBtn.style.backgroundColor = "#10b981"; // Green success
-            
-            setTimeout(() => {
-                copyBtn.innerText = originalText;
-                copyBtn.style.backgroundColor = ""; // Reset
-            }, 2000);
-        }).catch(err => {
-            console.error("Could not copy text: ", err);
-        });
+        teaserBox.classList.remove("revealed");
     });
 }
 
@@ -463,18 +643,13 @@ function createConfetti(container) {
         const piece = document.createElement("div");
         piece.className = "confetti-piece";
         piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Random positions starting near top center of container
         piece.style.left = `${Math.random() * 80 + 10}%`;
         piece.style.top = `-10px`;
-        
-        // Random falling properties
         piece.style.setProperty("--drift", `${(Math.random() - 0.5) * 80}px`);
         piece.style.animationDelay = `${Math.random() * 0.6}s`;
         piece.style.animationDuration = `${Math.random() * 1.5 + 1.2}s`;
         
-        // Random rotation & size
-        const size = Math.random() * 6 + 6; // 6px to 12px
+        const size = Math.random() * 6 + 6;
         piece.style.width = `${size}px`;
         piece.style.height = `${size}px`;
         piece.style.transform = `rotate(${Math.random() * 360}deg)`;
@@ -494,18 +669,14 @@ function initCustomizer() {
     const resetBtn = document.getElementById("customizer-reset");
     const saveBtn = document.getElementById("customizer-save");
     
-    // Pickers
     const pickerHeroBg = document.getElementById("picker-hero-bg");
     const pickerTitleColor = document.getElementById("picker-title-color");
     const pickerStarsColor = document.getElementById("picker-stars-color");
     const pickerDotsColor = document.getElementById("picker-dots-color");
-    
-    // Font buttons
     const fontBtns = document.querySelectorAll(".font-btn");
     
     if (!toggle || !panel) return;
     
-    // Open/Close
     toggle.addEventListener("click", () => {
         panel.classList.add("open");
     });
@@ -514,17 +685,14 @@ function initCustomizer() {
         panel.classList.remove("open");
     });
     
-    // Close panel if clicked outside
     document.addEventListener("click", (e) => {
         if (!panel.contains(e.target) && !toggle.contains(e.target) && panel.classList.contains("open")) {
             panel.classList.remove("open");
         }
     });
     
-    // Synchronize form controls with current variable values on load
     syncPickerValues();
     
-    // Setup Picker Live Changes
     pickerHeroBg.addEventListener("input", (e) => {
         document.documentElement.style.setProperty("--hero-bg-color", e.target.value);
     });
@@ -538,18 +706,15 @@ function initCustomizer() {
         document.documentElement.style.setProperty("--dots-color", e.target.value);
     });
     
-    // Font selector changes
     fontBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             fontBtns.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            
             const fontKey = btn.getAttribute("data-font");
             applyFontFamily(fontKey);
         });
     });
     
-    // Save theme button
     saveBtn.addEventListener("click", () => {
         const activeFontBtn = document.querySelector(".font-btn.active");
         const activeFont = activeFontBtn ? activeFontBtn.getAttribute("data-font") : "dynapuff";
@@ -564,25 +729,22 @@ function initCustomizer() {
         
         localStorage.setItem("fantastic_fashion_theme", JSON.stringify(theme));
         
-        // Show success animation on button
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "Theme Saved! ✨";
-        saveBtn.style.backgroundColor = "#10b981"; // Success Green
+        saveBtn.style.backgroundColor = "#10b981";
         
         setTimeout(() => {
             saveBtn.innerText = originalText;
-            saveBtn.style.backgroundColor = ""; // Reset
+            saveBtn.style.backgroundColor = "";
             panel.classList.remove("open");
         }, 1500);
     });
     
-    // Reset button
     resetBtn.addEventListener("click", () => {
         localStorage.removeItem("fantastic_fashion_theme");
         applyTheme(DEFAULT_THEME);
         syncPickerValues();
         
-        // Reset active font button
         fontBtns.forEach(b => {
             if (b.getAttribute("data-font") === "dynapuff") {
                 b.classList.add("active");
@@ -591,7 +753,6 @@ function initCustomizer() {
             }
         });
         
-        // Show reset feedback on reset button
         const originalText = resetBtn.innerText;
         resetBtn.innerText = "Reset Done!";
         setTimeout(() => {
@@ -622,7 +783,6 @@ function syncPickerValues() {
         document.getElementById("picker-dots-color").value = convertToHex(dotsColor) || DEFAULT_THEME.dotsColor;
     }
     
-    // Sync font buttons state
     const fontBtns = document.querySelectorAll(".font-btn");
     fontBtns.forEach(btn => {
         const fontAttr = btn.getAttribute("data-font");
@@ -640,7 +800,6 @@ function syncPickerValues() {
     });
 }
 
-// Helper to convert rgb(x, y, z) outputted by browser styles to #hex
 function convertToHex(colorVal) {
     if (!colorVal) return null;
     if (colorVal.startsWith("#")) return colorVal;
@@ -656,7 +815,7 @@ function convertToHex(colorVal) {
 }
 
 /* ==========================================================================
-   8. Contact Form Verification & Submissions (with AJAX submission)
+   8. Contact Form Submissions (Anti-Spam Verification: Ontario)
    ========================================================================== */
 
 function initContactForm() {
@@ -669,7 +828,6 @@ function initContactForm() {
     
     if (!form || !successMsg) return;
     
-    // Sync redirection URL (FormSubmit works with _next, but since we submit AJAX, we don't strictly need it. We still configure it just in case fallback happens.)
     const nextInput = form.querySelector('input[name="_next"]');
     if (nextInput) {
         nextInput.value = window.location.href;
@@ -682,19 +840,16 @@ function initContactForm() {
         const honeypotVal = document.getElementById("form_website").value;
         if (honeypotVal) {
             console.warn("Honeypot filled! Blocking spam submission.");
-            // Pretend success so bot doesn't keep trying
             showSuccessPanel();
             return;
         }
         
-        // 2. Custom Semantic Challenge Check
+        // 2. Custom Semantic Challenge Check: Ontario
         const challengeVal = challengeInput.value.trim().toLowerCase();
-        // Erika is spelled with a K. So answer should be 'k' (or 'k' inside a sentence, e.g. "with a k" or just "k")
-        if (!challengeVal.includes("k") || challengeVal.includes("c")) {
+        if (!challengeVal.includes("ontario")) {
             challengeError.classList.add("show");
             challengeInput.focus();
             
-            // Vibrate error (if mobile)
             if (navigator.vibrate) navigator.vibrate(100);
             
             setTimeout(() => {
@@ -707,7 +862,6 @@ function initContactForm() {
         // 3. Form Validation Passed -> Submit via AJAX
         setSubmittingState(true);
         
-        // Collect form data
         const formData = {
             name: document.getElementById("form_name").value,
             email: document.getElementById("form_email").value,
@@ -715,7 +869,6 @@ function initContactForm() {
             _subject: form.querySelector('input[name="_subject"]').value
         };
         
-        // Submit using AJAX endpoint of FormSubmit (ajax method)
         fetch("https://formsubmit.co/ajax/fantastic.fashion@gmail.com", {
             method: "POST",
             headers: {
@@ -730,13 +883,12 @@ function initContactForm() {
             if (data.success === "true" || data.success === true) {
                 showSuccessPanel();
             } else {
-                alert("Oh no! Something went wrong sending your message. Please try again or email us directly at fantastic.fashion@gmail.com!");
+                alert("Oh no! Something went wrong sending your message. Please email us directly or try again!");
             }
         })
         .catch(err => {
             console.error("Submission error:", err);
             setSubmittingState(false);
-            // Fallback: Submit the old-fashioned way by triggering native submit
             alert("Connection error. Submitting the form...");
             form.submit();
         });
@@ -767,8 +919,7 @@ function initContactForm() {
         form.style.opacity = "0";
         form.style.pointerEvents = "none";
         
-        // Trigger a nice confetti explosion on success!
-        const successPos = successMsg.getBoundingClientRect();
+        //Confetti on success
         createConfetti(document.getElementById("confetti-container"));
     }
 }

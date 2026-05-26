@@ -29,6 +29,7 @@
             <button class="customizer-close" id="customizer-close" aria-label="Close Design Panel">&times;</button>
         </div>
         <div class="customizer-body">
+            <p style="font-size:0.75rem; color:var(--text-light); margin-top:-10px; margin-bottom:15px; font-style:italic; line-height:1.3; background: #fffbf0; padding: 6px 10px; border-radius: 8px; border: 1px solid #ffeeba;">💡 Tip for Kayla & Erika: To save a theme for everyone, copy the colors from this panel into style.css!</p>
             <div class="customizer-section">
                 <h4>Choose Colors 🌈</h4>
                 <div class="color-picker-group">
@@ -183,18 +184,14 @@
                         <p>Click the wiggling gift box to open a special discount surprise! 🎁</p>
                     </div>
                     
-                    <!-- Hidden Coupon Content -->
+                    <!-- Hidden Coupon Content (Cleaned up, no code box) -->
                     <div class="coupon-reveal-card" id="coupon-reveal">
                         <div class="confetti-explosion" id="confetti-container"></div>
                         <span class="close-coupon" id="close-coupon">&times;</span>
                         <div class="coupon-header">🎉 Surprise Discount! 🎉</div>
                         <div class="coupon-discount">$5 OFF</div>
                         <p class="coupon-terms">When you buy 3 or more of anything!</p>
-                        <div class="coupon-code-box">
-                            <span class="coupon-code">FANTASTIC5</span>
-                            <button class="copy-code-btn" id="copy-code-btn">Copy Code</button>
-                        </div>
-                        <p class="coupon-subtext">Mention this coupon in your message below!</p>
+                        <p class="coupon-subtext">Just mention this coupon in your message below!</p>
                     </div>
                 </div>
             </div>
@@ -205,8 +202,8 @@
             <div class="container">
                 <div class="contact-card">
                     <div class="contact-header">
-                        <h2>Place an Order or Say Hello! 👋</h2>
-                        <p>Fill out the form below to send an email straight to <strong>fantastic.fashion@gmail.com</strong>. We'll get back to you soon!</p>
+                        <h2>Place an Order! 👋</h2>
+                        <p>Fill out the form below to send an order request straight to Kayla and Erika. We'll get back to you soon!</p>
                     </div>
 
                     <!-- Contact Form pointing to formsubmit.co -->
@@ -243,10 +240,10 @@
                         <!-- Anti-Spam Verification Challenge -->
                         <div class="form-group verification-group">
                             <label for="form_challenge" class="challenge-label">
-                                🤖 Safety Check: Is Erika's name spelled with a <strong style="color: var(--primary-color);">C</strong> or a <strong style="color: var(--primary-color);">K</strong>?
+                                🤖 Safety Check: What province is Toronto in? (Hint: Ontario)
                             </label>
-                            <input type="text" id="form_challenge" placeholder="Type C or K here" required autocomplete="off">
-                            <p class="challenge-error" id="challenge-error">Oops! Double check the spelling of Erika's name!</p>
+                            <input type="text" id="form_challenge" placeholder="Type province name here" required autocomplete="off">
+                            <p class="challenge-error" id="challenge-error">Oops! Double check the name of the province!</p>
                         </div>
 
                         <div class="form-actions">
