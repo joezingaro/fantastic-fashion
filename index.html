@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantastic Fashion - Handmade Jewelry by Kayla & Erika</title>
+    <meta name="description" content="Welcome to Fantastic Fashion! Beautiful handmade bracelets, keychains, and earrings made with love by Kayla and Erika. Shop custom orders in any color!">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=DynaPuff:wght@600;800&family=Fredoka:wght@500;700&family=Outfit:wght@400;600;800&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Magic Wand Mouse Trail Canvas -->
+    <canvas id="trail-canvas"></canvas>
+
+    <!-- Theme Customizer Panel -->
+    <button class="customizer-toggle" id="customizer-toggle" aria-label="Open Design Panel">
+        🎨 <span class="tooltip">Customize Style</span>
+    </button>
+    <div class="customizer-panel" id="customizer-panel">
+        <div class="customizer-header">
+            <h3>Customize Theme! 🎨</h3>
+            <button class="customizer-close" id="customizer-close" aria-label="Close Design Panel">&times;</button>
+        </div>
+        <div class="customizer-body">
+            <div class="customizer-section">
+                <h4>Choose Colors 🌈</h4>
+                <div class="color-picker-group">
+                    <label>
+                        <span>Background</span>
+                        <input type="color" id="picker-hero-bg" value="#0033ff">
+                    </label>
+                    <label>
+                        <span>Title Pink</span>
+                        <input type="color" id="picker-title-color" value="#ff2a85">
+                    </label>
+                    <label>
+                        <span>Sparkly Stars</span>
+                        <input type="color" id="picker-stars-color" value="#ffff00">
+                    </label>
+                    <label>
+                        <span>Gold Dots</span>
+                        <input type="color" id="picker-dots-color" value="#ffd700">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="customizer-section">
+                <h4>Choose Font 🔠</h4>
+                <div class="font-selector-group">
+                    <button class="font-btn active" data-font="dynapuff" style="font-family: 'DynaPuff', sans-serif;">DynaPuff</button>
+                    <button class="font-btn" data-font="fredoka" style="font-family: 'Fredoka', sans-serif;">Fredoka</button>
+                    <button class="font-btn" data-font="bubblegum" style="font-family: 'Bubblegum Sans', cursive;">Bubblegum</button>
+                    <button class="font-btn" data-font="caveat" style="font-family: 'Caveat', cursive;">Caveat</button>
+                </div>
+            </div>
+
+            <div class="customizer-footer">
+                <button class="customizer-reset" id="customizer-reset">Reset</button>
+                <button class="customizer-save" id="customizer-save">Save Theme ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main>
+        
+        <!-- Hero Section -->
+        <section class="hero" id="hero-section">
+            <div class="stars-overlay" id="stars-overlay"></div>
+            
+            <div class="hero-content">
+                <!-- Three Gold Dots -->
+                <div class="gold-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                
+                <!-- Bubbly Title -->
+                <h1 class="bubble-title" id="bubble-title-first">
+                    <span class="pop-letter">F</span><span class="pop-letter">a</span><span class="pop-letter">n</span><span class="pop-letter">t</span><span class="pop-letter">a</span><span class="pop-letter">s</span><span class="pop-letter">t</span><span class="pop-letter">i</span><span class="pop-letter">c</span>
+                </h1>
+                <h1 class="bubble-title" id="bubble-title-second">
+                    <span class="pop-letter">F</span><span class="pop-letter">a</span><span class="pop-letter">s</span><span class="pop-letter">h</span><span class="pop-letter">i</span><span class="pop-letter">o</span><span class="pop-letter">n</span>
+                </h1>
+                
+                <p class="subtitle">By Kayla and Erika</p>
+                
+                <!-- Bounce Arrow Indicator -->
+                <div class="scroll-indicator">
+                    <a href="#products-section" class="scroll-link">
+                        <span>Scroll to Explore</span>
+                        <div class="arrow">↓</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section class="products" id="products-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our Handmade Creations ✨</h2>
+                    <p class="section-tagline">Each piece is made with lots of love and care!</p>
+                </div>
+                
+                <div class="products-grid">
+                    <!-- Product 1: Keychains -->
+                    <div class="product-card" id="card-keychains">
+                        <div class="product-image-wrapper">
+                            <img src="assets/keychain_product.png" alt="Handmade colorful beaded keychain" class="product-image">
+                            <span class="product-tag">Best Seller</span>
+                        </div>
+                        <div class="product-info">
+                            <h3>Keychains</h3>
+                            <p class="product-price">$6</p>
+                            <p class="product-description">Super cute beaded keychains for backpacks, keys, or bags! Can include custom letter beads to spell your name.</p>
+                        </div>
+                    </div>
+
+                    <!-- Product 2: Bracelets -->
+                    <div class="product-card" id="card-bracelets">
+                        <div class="product-image-wrapper">
+                            <img src="assets/bracelet_product.png" alt="Handmade colorful beaded friendship bracelet" class="product-image">
+                            <span class="product-tag">Popular</span>
+                        </div>
+                        <div class="product-info">
+                            <h3>Bracelets</h3>
+                            <p class="product-price">$5</p>
+                            <p class="product-description">Beautiful stretchy friendship bracelets in any color combo you want. Perfect for stacking and sharing!</p>
+                        </div>
+                    </div>
+
+                    <!-- Product 3: Earrings -->
+                    <div class="product-card" id="card-earrings">
+                        <div class="product-image-wrapper">
+                            <img src="assets/earrings_product.png" alt="Handmade cute dangle earrings" class="product-image">
+                            <span class="product-tag">New</span>
+                        </div>
+                        <div class="product-info">
+                            <h3>Earrings</h3>
+                            <p class="product-price">$6 – $8</p>
+                            <p class="product-description">Dainty, lightweight dangle earrings made with colorful beads and charms. Perfect to brighten up any outfit!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Orders Alert Box -->
+                <div class="custom-orders-banner">
+                    <span class="banner-icon">🎨</span>
+                    <div class="banner-text">
+                        <h3>Custom Orders Available!</h3>
+                        <p>We can make any bracelet, keychain, or earring in your favorite colors. Just let us know in the form below!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Secret Coupon Section -->
+        <section class="secret-coupon-section">
+            <div class="container">
+                <div class="coupon-teaser-box">
+                    <div class="gift-box-container" id="gift-box">
+                        <div class="gift-box">
+                            <div class="gift-box-lid"></div>
+                            <div class="gift-box-ribbon"></div>
+                        </div>
+                        <div class="gift-sparkles">
+                            <span class="mini-star">★</span>
+                            <span class="mini-star">★</span>
+                            <span class="mini-star">★</span>
+                        </div>
+                    </div>
+                    <div class="teaser-text">
+                        <h3>Psst... There's a secret hidden here!</h3>
+                        <p>Click the wiggling gift box to open a special discount surprise! 🎁</p>
+                    </div>
+                    
+                    <!-- Hidden Coupon Content -->
+                    <div class="coupon-reveal-card" id="coupon-reveal">
+                        <div class="confetti-explosion" id="confetti-container"></div>
+                        <span class="close-coupon" id="close-coupon">&times;</span>
+                        <div class="coupon-header">🎉 Surprise Discount! 🎉</div>
+                        <div class="coupon-discount">$5 OFF</div>
+                        <p class="coupon-terms">When you buy 3 or more of anything!</p>
+                        <div class="coupon-code-box">
+                            <span class="coupon-code">FANTASTIC5</span>
+                            <button class="copy-code-btn" id="copy-code-btn">Copy Code</button>
+                        </div>
+                        <p class="coupon-subtext">Mention this coupon in your message below!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact" id="contact-section">
+            <div class="container">
+                <div class="contact-card">
+                    <div class="contact-header">
+                        <h2>Place an Order or Say Hello! 👋</h2>
+                        <p>Fill out the form below to send an email straight to <strong>fantastic.fashion@gmail.com</strong>. We'll get back to you soon!</p>
+                    </div>
+
+                    <!-- Contact Form pointing to formsubmit.co -->
+                    <form action="https://formsubmit.co/fantastic.fashion@gmail.com" method="POST" id="contact-form">
+                        
+                        <!-- FormSubmit Configuration -->
+                        <input type="hidden" name="_subject" value="New Order / Inquiry for Fantastic Fashion! ✨">
+                        <input type="hidden" name="_next" value=""> <!-- Populated via JS for custom success state -->
+                        <input type="hidden" name="_template" value="table">
+                        
+                        <!-- Anti-Spam Honeypot Field (Invisible to users) -->
+                        <div class="honeypot-field" style="display:none;">
+                            <label for="form_website">Do not fill this out if you are human:</label>
+                            <input type="text" name="form_website" id="form_website" autocomplete="off" tabindex="-1">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="form_name">Your Name 👤</label>
+                                <input type="text" id="form_name" name="name" placeholder="What's your name?" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="form_email">Your Email 📧</label>
+                                <input type="email" id="form_email" name="email" placeholder="example@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="form_message">What would you like to order or learn more about? 🛍️</label>
+                            <textarea id="form_message" name="message" rows="5" placeholder="Let us know what products you want, what colors you like, or any questions you have!" required></textarea>
+                        </div>
+
+                        <!-- Anti-Spam Verification Challenge -->
+                        <div class="form-group verification-group">
+                            <label for="form_challenge" class="challenge-label">
+                                🤖 Safety Check: Is Erika's name spelled with a <strong style="color: var(--primary-color);">C</strong> or a <strong style="color: var(--primary-color);">K</strong>?
+                            </label>
+                            <input type="text" id="form_challenge" placeholder="Type C or K here" required autocomplete="off">
+                            <p class="challenge-error" id="challenge-error">Oops! Double check the spelling of Erika's name!</p>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="submit-btn" id="submit-btn">
+                                <span class="btn-text">Send Message ✨</span>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Custom Form Success Message (Hidden by default) -->
+                    <div class="success-message" id="success-message">
+                        <div class="success-icon">🎉</div>
+                        <h3>Message Sent Successfully!</h3>
+                        <p>Yay! Thank you so much for supporting Fantastic Fashion. Kayla and Erika will look at your message and reply back to your email address soon!</p>
+                        <button class="reset-form-btn" id="reset-form-btn">Send Another Message</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Fantastic Fashion. Handmade with 💖 by Kayla & Erika.</p>
+            <p class="footer-note">Website designed with magic elements ✨</p>
+        </div>
+    </footer>
+
+    <!-- Magical Name Banners (for Easter Eggs) -->
+    <div class="name-banner" id="banner-kayla">
+        <div class="banner-content">
+            <h2>💖 Kayla's Magic! 🌟</h2>
+            <p>Sparkle explosion activated!</p>
+        </div>
+    </div>
+    <div class="name-banner" id="banner-erika">
+        <div class="banner-content">
+            <h2>✨ Erika's Magic! 🌈</h2>
+            <p>Color party activated!</p>
+        </div>
+    </div>
+
+    <!-- Script File -->
+    <script src="app.js"></script>
+</body>
+</html>
