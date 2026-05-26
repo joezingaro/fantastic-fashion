@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fantastic Fashion Interactive Engine - Ultra Performance Optimized
+   Fantastic Fashion Interactive Engine - Reverted & Optimized Trail
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -113,15 +113,15 @@ function spawnStar(container, isInitial = false) {
 }
 
 /* ==========================================================================
-   3. Falling Stardust Trail Engine (Dynamic Sleep Loop)
+   3. Fast-Fade Stardust Trail Engine (Dynamic Sleep Loop)
    ========================================================================== */
 
 let globalParticles = [];
-let isLoopRunning = false; // Controls if animation loop is active
+let isLoopRunning = false;
 
 let lastSpawnX = 0;
 let lastSpawnY = 0;
-const SPAWN_THRESHOLD = 20; // Move at least 20px to spawn stardust
+const SPAWN_THRESHOLD = 20; 
 
 function initMouseTrail() {
     const canvas = document.getElementById("trail-canvas");
@@ -176,7 +176,7 @@ function initMouseTrail() {
         globalParticles.push(p);
         
         // Cap particles array to keep mobile rendering fast
-        const maxParticles = 40;
+        const maxParticles = 25;
         if (globalParticles.length > maxParticles) {
             globalParticles.shift();
         }
@@ -188,20 +188,20 @@ function initMouseTrail() {
         }
     }
 
-    // Sparkle Particle Creator (Drifts DOWNWARDS)
+    // Sparkle Particle Creator (REVERTED TO ORIGINAL: floats upwards, small size, fast decay)
     function createParticle(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
         return {
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: Math.random() * 2 + 1,            // Falls down
-            size: Math.random() * 9 + 5,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: (Math.random() - 0.5) * 2.5 - 1.5, // Floats UPWARDS quickly
+            size: Math.random() * 8 + 4,          // Original small size
             color: colors[Math.floor(Math.random() * colors.length)],
             alpha: 1,
-            decay: Math.random() * 0.015 + 0.01,   // Fades out in 1.5-2 seconds
+            decay: Math.random() * 0.022 + 0.018, // Original fast decay (fades in ~0.5s)
             rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.08
+            rotationSpeed: (Math.random() - 0.5) * 0.1
         };
     }
     
@@ -223,7 +223,6 @@ function initMouseTrail() {
     }
     
     function updateParticles() {
-        // If there are no particles, clear canvas and sleep the loop (0% idle CPU)
         if (globalParticles.length === 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             isLoopRunning = false;
@@ -249,22 +248,22 @@ function initMouseTrail() {
         requestAnimationFrame(updateParticles);
     }
     
-    // Sparkle Burst (Click/Tap triggers)
+    // Sparkle Burst (Click/Tap triggers - Reverted parameters)
     function spawnBurst(x, y) {
         const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-        const count = 10;
+        const count = 8;
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
-            const speed = Math.random() * 3 + 1.2;
+            const speed = Math.random() * 3 + 1;
             addParticle({
                 x: x,
                 y: y,
                 vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed + 1.2, // Drifts down
-                size: Math.random() * 10 + 5,
+                vy: Math.sin(angle) * speed - 0.5, // Floats up
+                size: Math.random() * 8 + 4,
                 color: colors[Math.floor(Math.random() * colors.length)],
                 alpha: 1,
-                decay: Math.random() * 0.018 + 0.012, // Prunes fast
+                decay: Math.random() * 0.022 + 0.018,
                 rotation: Math.random() * Math.PI * 2,
                 rotationSpeed: (Math.random() - 0.5) * 0.12
             });
@@ -351,7 +350,7 @@ function initBubbleLetters() {
                     letter.classList.remove("hover-simulate");
                 }, 850);
             }
-        }, 1800); // Wiggle slightly less frequently
+        }, 1800); 
     }
 }
 
@@ -441,10 +440,10 @@ function initEasterEggs() {
         }
     }
 
-    // Double Tap subtitle trigger (Alternative Mobile Easter Egg)
+    // Double Tap subtitle trigger (Clean names, no underline text decoration)
     const subtitle = document.querySelector(".subtitle");
     if (subtitle) {
-        subtitle.innerHTML = `By <span class="owner-tap" id="tap-kayla" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4); font-weight: bold; transition: color 0.2s;">Kayla</span> and <span class="owner-tap" id="tap-erika" style="cursor:pointer; text-decoration: underline dashed rgba(255,255,255,0.4); font-weight: bold; transition: color 0.2s;">Erika</span>`;
+        subtitle.innerHTML = `By <span class="owner-tap" id="tap-kayla" style="cursor:pointer; font-weight: bold; transition: color 0.2s;">Kayla</span> and <span class="owner-tap" id="tap-erika" style="cursor:pointer; font-weight: bold; transition: color 0.2s;">Erika</span>`;
         
         const tapKayla = document.getElementById("tap-kayla");
         const tapErika = document.getElementById("tap-erika");
@@ -505,7 +504,7 @@ function triggerEasterEgg(name) {
         emojis = ["🌈", "🌟", "🎨", "💍", "💎", "💫", "🍕", "🐱", "🐶", "🧁", "🍩"];
     }
     
-    const count = 20; // Reduced count to keep mobile stardust showers smooth
+    const count = 20; 
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const element = document.createElement("div");
@@ -562,7 +561,7 @@ function createConfetti(container) {
     container.innerHTML = "";
     
     const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff"];
-    const count = 20; // Reduced confetti count to keep rendering fast
+    const count = 20; 
     
     for (let i = 0; i < count; i++) {
         const piece = document.createElement("div");
