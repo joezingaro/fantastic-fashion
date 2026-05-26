@@ -52,6 +52,10 @@
                         <span>Scroll to Explore</span>
                         <div class="arrow">↓</div>
                     </a>
+                    <!-- Pop Counter -->
+                    <div id="pop-counter-container" class="pop-counter-container">
+                        🎈 Letters Popped: <span id="pop-count-number" class="pop-count-num">0</span>/100
+                    </div>
                 </div>
             </div>
         </section>
@@ -237,6 +241,21 @@
         <div class="banner-content">
             <h2>✨ Erika's Magic! 🌈</h2>
             <p>Color party activated!</p>
+        </div>
+    </div>
+
+    <!-- Pop Master Modal -->
+    <div id="pop-master-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-emoji">👑🏆💖</div>
+            <h2>🎉 POP MASTER UNLOCKED! 🎉</h2>
+            <p>Wow! You popped <strong>100 bubble letters</strong>! You are officially a Fantastic Fashion Superstar! ⭐</p>
+            <div class="modal-code-box">
+                <span>Your Secret Reward Code:</span>
+                <strong id="reward-code">SUPERPOP</strong>
+            </div>
+            <p class="modal-note">Tell Kayla and Erika this code to get a free surprise gift with your order! 🎁</p>
+            <button id="close-pop-master" class="modal-btn">Hooray! 🥳</button>
         </div>
     </div>
 

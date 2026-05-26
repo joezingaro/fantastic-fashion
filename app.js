@@ -73,7 +73,7 @@ function initSparkleStars() {
     if (!overlay) return;
     
     // Create a fixed set of stars once. No dynamic DOM insertion/deletion intervals needed!
-    const count = window.innerWidth < 768 ? 12 : 24;
+    const count = window.innerWidth < 768 ? 35 : 60;
     for (let i = 0; i < count; i++) {
         spawnStar(overlay, true);
     }
@@ -264,29 +264,144 @@ function initMouseTrail() {
    4. Bubble Letter Popping & Mobile Idle Animation
    ========================================================================== */
 
+let globalAudioCtx = null;
+let popCount = 0;
+let popCounterShown = false;
+
 function playPopSound() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtx) return;
         
-        const audioCtx = new AudioCtx();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+        if (!globalAudioCtx) {
+            globalAudioCtx = new AudioCtx();
+        }
+        
+        if (globalAudioCtx.state === "suspended") {
+            globalAudioCtx.resume();
+        }
+        
+        const osc = globalAudioCtx.createOscillator();
+        const gainNode = globalAudioCtx.createGain();
         
         osc.type = "sine";
-        osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(140, globalAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(780, globalAudioCtx.currentTime + 0.08);
         
-        gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.25, globalAudioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, globalAudioCtx.currentTime + 0.1);
         
         osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.connect(globalAudioCtx.destination);
         
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
+        osc.stop(globalAudioCtx.currentTime + 0.12);
     } catch (e) {
         console.log("Audio blocked by browser config:", e);
+    }
+}
+
+function playFanfareSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        
+        if (!globalAudioCtx) {
+            globalAudioCtx = new AudioCtx();
+        }
+        
+        if (globalAudioCtx.state === "suspended") {
+            globalAudioCtx.resume();
+        }
+        
+        const now = globalAudioCtx.currentTime;
+        
+        // Ascending chime notes: C5, E5, G5, C6
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+            const osc = globalAudioCtx.createOscillator();
+            const gain = globalAudioCtx.createGain();
+            
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+            
+            gain.gain.setValueAtTime(0, now + idx * 0.15);
+            gain.gain.linearRampToValueAtTime(0.2, now + idx * 0.15 + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.15 + 0.35);
+            
+            osc.connect(gain);
+            gain.connect(globalAudioCtx.destination);
+            
+            osc.start(now + idx * 0.15);
+            osc.stop(now + idx * 0.15 + 0.4);
+        });
+    } catch (e) {
+        console.log("Fanfare sound error:", e);
+    }
+}
+
+function incrementPopCount() {
+    popCount++;
+    
+    const counterContainer = document.getElementById("pop-counter-container");
+    const counterNumber = document.getElementById("pop-count-number");
+    
+    if (counterNumber) {
+        counterNumber.innerText = popCount;
+        
+        counterNumber.classList.add("bump");
+        setTimeout(() => {
+            counterNumber.classList.remove("bump");
+        }, 150);
+    }
+    
+    if (popCount >= 3 && !popCounterShown && counterContainer) {
+        counterContainer.classList.add("visible");
+        popCounterShown = true;
+    }
+    
+    if (popCount === 100) {
+        triggerPopMasterReward();
+    }
+}
+
+function triggerPopMasterReward() {
+    playFanfareSound();
+    triggerMassiveEmojiRain();
+    
+    const modal = document.getElementById("pop-master-modal");
+    if (modal) {
+        modal.classList.add("show");
+    }
+    
+    const confettiContainer = document.getElementById("confetti-container");
+    createConfetti(confettiContainer);
+    setTimeout(() => {
+        createConfetti(confettiContainer);
+    }, 500);
+}
+
+function triggerMassiveEmojiRain() {
+    const emojis = ["👑", "🏆", "🌟", "✨", "🎈", "🎉", "💖", "💎", "🌈", "⭐", "🍕", "🧁", "🍭", "🧸", "🦄"];
+    const count = 50;
+    for (let i = 0; i < count; i++) {
+        setTimeout(() => {
+            const element = document.createElement("div");
+            element.className = "rain-emoji";
+            element.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            element.style.left = `${Math.random() * 95}%`;
+            element.style.transform = `scale(${Math.random() * 0.8 + 0.8})`;
+            element.style.zIndex = "2100";
+            
+            const duration = Math.random() * 2.5 + 2;
+            element.style.animationDuration = `${duration}s`;
+            
+            document.body.appendChild(element);
+            
+            setTimeout(() => {
+                element.remove();
+            }, duration * 1000);
+        }, i * 60);
     }
 }
 
@@ -302,6 +417,9 @@ function initBubbleLetters() {
             playPopSound();
             letter.classList.add("popped");
             createPopVisualEffect(letter);
+            
+            // Increment the counter
+            incrementPopCount();
             
             setTimeout(() => {
                 letter.classList.remove("popped");
@@ -322,6 +440,16 @@ function initBubbleLetters() {
             }, 1200);
         });
     });
+
+    // Modal Close handler
+    const modal = document.getElementById("pop-master-modal");
+    const closeModalBtn = document.getElementById("close-pop-master");
+    if (modal && closeModalBtn) {
+        closeModalBtn.addEventListener("click", () => {
+            modal.classList.remove("show");
+            createConfetti(document.getElementById("confetti-container"));
+        });
+    }
 }
 
 function createPopVisualEffect(element) {
