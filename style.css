@@ -1608,18 +1608,48 @@ footer p:first-child {
 }
 
 /* Rainbow Shimmer - Fever Dream mode! */
+.rainbow-shimmer-active body {
+    background: linear-gradient(rgba(10, 15, 45, 0.82), rgba(10, 15, 45, 0.82)),
+                linear-gradient(135deg, 
+                    #ff2a85 0%, 
+                    #ff9d00 16%, 
+                    #ffff00 33%, 
+                    #00e676 50%, 
+                    #00e5ff 66%, 
+                    #2979ff 83%, 
+                    #b026ff 100%
+                ) !important;
+    background-size: 100% 100%, 600% 600% !important;
+    animation: rainbow-hero-shift 18s ease infinite !important;
+    color: #ffffff !important;
+}
+
+.rainbow-shimmer-active .products,
+.rainbow-shimmer-active .secret-coupon-section,
+.rainbow-shimmer-active .contact {
+    background-color: transparent !important;
+}
+
 .rainbow-shimmer-active .product-card,
-.rainbow-shimmer-active .contact-form-container,
+.rainbow-shimmer-active .contact-card,
 .rainbow-shimmer-active .modal-card,
+.rainbow-shimmer-active .coupon-reveal-card,
+.rainbow-shimmer-active .gift-box-container,
 .rainbow-shimmer-active .gift-container {
     position: relative;
     border: none !important;
+    background: rgba(10, 15, 45, 0.93) !important;
+    backdrop-filter: blur(12px) !important;
     z-index: 1;
+    color: #ffffff !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 42, 133, 0.15) !important;
 }
 
 .rainbow-shimmer-active .product-card::before,
-.rainbow-shimmer-active .contact-form-container::before,
+.rainbow-shimmer-active .contact-card::before,
 .rainbow-shimmer-active .modal-card::before,
+.rainbow-shimmer-active .coupon-reveal-card::before,
+.rainbow-shimmer-active .gift-box-container::before,
 .rainbow-shimmer-active .gift-container::before {
     content: '';
     position: absolute;
@@ -1637,7 +1667,7 @@ footer p:first-child {
     border-radius: 20px;
 }
 
-.rainbow-shimmer-active .contact-form-container::before {
+.rainbow-shimmer-active .contact-card::before {
     border-radius: 20px;
 }
 
@@ -1645,10 +1675,127 @@ footer p:first-child {
     border-radius: 28px;
 }
 
+.rainbow-shimmer-active .coupon-reveal-card::before {
+    border-radius: 20px;
+}
+
+.rainbow-shimmer-active .gift-box-container::before,
 .rainbow-shimmer-active .gift-container::before {
     border-radius: 20px;
 }
 
+/* White text overrides for readability inside the cards */
+.rainbow-shimmer-active .product-info h3,
+.rainbow-shimmer-active .product-description,
+.rainbow-shimmer-active .product-price,
+.rainbow-shimmer-active .contact-header h2,
+.rainbow-shimmer-active .contact-header p,
+.rainbow-shimmer-active .form-group label,
+.rainbow-shimmer-active .form-group input,
+.rainbow-shimmer-active .form-group textarea,
+.rainbow-shimmer-active .challenge-label,
+.rainbow-shimmer-active .custom-orders-banner h3,
+.rainbow-shimmer-active .custom-orders-banner p,
+.rainbow-shimmer-active .teaser-text h3,
+.rainbow-shimmer-active .teaser-text p,
+.rainbow-shimmer-active .teaser-title,
+.rainbow-shimmer-active .teaser-desc,
+.rainbow-shimmer-active .coupon-reveal-card .coupon-terms,
+.rainbow-shimmer-active .coupon-reveal-card .coupon-subtext,
+.rainbow-shimmer-active footer,
+.rainbow-shimmer-active footer p,
+.rainbow-shimmer-active footer .footer-note {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Custom design for coupon content in rainbow mode */
+.rainbow-shimmer-active .coupon-reveal-card .coupon-header {
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255, 42, 133, 0.6) !important;
+}
+.rainbow-shimmer-active .coupon-reveal-card .coupon-discount {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px rgba(0, 229, 255, 0.8), 0 0 4px #ffffff !important;
+}
+
+/* Customizer styles in rainbow mode */
+.rainbow-shimmer-active .active-powerups-list {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.rainbow-shimmer-active .custom-orders-banner {
+    background: rgba(10, 15, 45, 0.93) !important;
+    border: 2px dashed rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    color: #ffffff !important;
+}
+
+/* Powerup modal buttons in rainbow mode */
+.rainbow-shimmer-active .powerup-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.rainbow-shimmer-active .powerup-btn:hover {
+    border-color: #ff2a85 !important;
+    box-shadow: 0 0 15px rgba(255, 42, 133, 0.4) !important;
+}
+
+.rainbow-shimmer-active .powerup-info strong {
+    color: #ffffff !important;
+}
+
+.rainbow-shimmer-active .powerup-info span {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Gold Dots and Falling Emojis in Rainbow mode */
+.rainbow-shimmer-active .gold-dots .dot {
+    animation: bounce-dots 2s infinite ease-in-out, rainbow-dots-glow 4s linear infinite !important;
+}
+
+.rainbow-shimmer-active .rain-emoji {
+    animation: rain-fall 4s linear forwards, rainbow-emoji-hue 4s linear infinite !important;
+}
+
+@keyframes rainbow-emoji-hue {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes rainbow-dots-glow {
+    0% { background-color: #ff2a85; box-shadow: 0 0 15px #ff2a85, 0 0 5px #ffffff; }
+    20% { background-color: #ff9d00; box-shadow: 0 0 15px #ff9d00, 0 0 5px #ffffff; }
+    40% { background-color: #ffff00; box-shadow: 0 0 15px #ffff00, 0 0 5px #ffffff; }
+    60% { background-color: #00e5ff; box-shadow: 0 0 15px #00e5ff, 0 0 5px #ffffff; }
+    80% { background-color: #b026ff; box-shadow: 0 0 15px #b026ff, 0 0 5px #ffffff; }
+    100% { background-color: #ff2a85; box-shadow: 0 0 15px #ff2a85, 0 0 5px #ffffff; }
+}
+
+/* Form input custom styling in dark mode */
+.rainbow-shimmer-active .form-group input,
+.rainbow-shimmer-active .form-group textarea {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.rainbow-shimmer-active .form-group input:focus,
+.rainbow-shimmer-active .form-group textarea:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 10px rgba(255, 42, 133, 0.3) !important;
+}
+
+.rainbow-shimmer-active .form-group input::placeholder,
+.rainbow-shimmer-active .form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Headers text gradients */
 .rainbow-shimmer-active .product-title,
 .rainbow-shimmer-active .section-header h2 {
     background: linear-gradient(to right, #ff2a85, #ff9d00, #ffff00, #00e5ff, #b026ff, #ff2a85);
@@ -1667,10 +1814,20 @@ footer p:first-child {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.6) !important;
 }
 
+/* Expanded full-spectrum ROYGBIV gradient shift for the hero background */
 .rainbow-shimmer-active .hero {
-    background: linear-gradient(135deg, #0033ff, #b026ff, #ff2a85, #00e5ff, #001270, #030825) !important;
-    background-size: 400% 400% !important;
-    animation: rainbow-hero-shift 15s ease infinite !important;
+    background: linear-gradient(rgba(10, 15, 45, 0.45), rgba(10, 15, 45, 0.65)),
+                linear-gradient(135deg, 
+                    #ff2a85 0%, 
+                    #ff9d00 16%, 
+                    #ffff00 33%, 
+                    #00e676 50%, 
+                    #00e5ff 66%, 
+                    #2979ff 83%, 
+                    #b026ff 100%
+                ) !important;
+    background-size: 100% 100%, 600% 600% !important;
+    animation: rainbow-hero-shift 12s linear infinite !important;
 }
 
 @keyframes rainbow-border-flow {

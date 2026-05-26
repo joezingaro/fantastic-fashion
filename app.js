@@ -429,7 +429,7 @@ function startGentleEmojiRain() {
         element.style.transform = `scale(${Math.random() * 0.5 + 0.6})`;
         
         // Gentle slow fall for background stardust trail
-        const duration = Math.random() * 5 + 5; // 5s to 10s
+        const duration = Math.random() * 4 + 4; // 4s to 8s
         element.style.animationDuration = `${duration}s`;
         
         document.body.appendChild(element);
@@ -437,7 +437,7 @@ function startGentleEmojiRain() {
         setTimeout(() => {
             element.remove();
         }, duration * 1000);
-    }, 800); 
+    }, 150); 
 }
 
 function stopGentleEmojiRain() {
