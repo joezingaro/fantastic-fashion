@@ -1089,7 +1089,7 @@ function initContactForm() {
             _subject: form.querySelector('input[name="_subject"]').value
         };
         
-        fetch("https://formsubmit.co/ajax/fantastic.fashion@gmail.com", {
+        fetch("https://formsubmit.co/ajax/stephanie.marie.norton+FANTASTICFASHION@gmail.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
