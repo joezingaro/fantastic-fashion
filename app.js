@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initGiftCoupon();
     initCustomizer();
     initContactForm();
+    initTeamFireworks();
 });
 
 /* ==========================================================================
@@ -1139,5 +1140,99 @@ function initContactForm() {
         form.style.pointerEvents = "none";
         
         createConfetti(document.getElementById("confetti-container"));
+    }
+}
+
+/* ==========================================================================
+   9. About Us Team Emoji Fireworks
+   ========================================================================== */
+
+function initTeamFireworks() {
+    const teamCards = document.querySelectorAll(".team-card");
+    const teamEmojis = {
+        kayla: ["👑", "💖", "🌸", "⭐", "⚪", "💕", "🌺", "🎀", "💝"],
+        erika: ["🪄", "🩵", "💎", "⭐", "🫧", "💙", "💠", "✨", "🌀"],
+        aria: ["🎨", "💜", "🔮", "⭐", "💮", "💟", "🪻", "🦄", "🟣"],
+        sora: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"]
+    };
+
+    teamCards.forEach(card => {
+        card.addEventListener("click", (e) => {
+            const memberId = card.id.replace("team-", ""); // kayla, erika, aria, sora
+            const emojis = teamEmojis[memberId];
+            if (!emojis) return;
+
+            // Get coordinates of the clicked location, or fallback to center of the card
+            let startX = e.clientX;
+            let startY = e.clientY;
+            
+            // If click triggered via keyboard focus (or client coordinates are 0)
+            if (e.clientX === 0 && e.clientY === 0) {
+                const rect = card.getBoundingClientRect();
+                startX = rect.left + rect.width / 2;
+                startY = rect.top + rect.height / 2;
+            }
+
+            // Play pop sound
+            playPopSound();
+
+            // Release 3 bursts spaced out slightly in time
+            const burstCount = 3;
+            for (let b = 0; b < burstCount; b++) {
+                setTimeout(() => {
+                    spawnEmojiBurst(startX, startY, emojis);
+                }, b * 150);
+            }
+        });
+    });
+
+    function spawnEmojiBurst(startX, startY, emojiPool) {
+        const count = 10; // Number of emojis in each burst
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 90 + 40;
+            const destX = Math.cos(angle) * distance;
+            // Negative start velocity, floats up then falls a bit
+            const destY = Math.sin(angle) * distance - 25; 
+
+            const emojiNode = document.createElement("div");
+            emojiNode.innerText = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+            emojiNode.style.position = "fixed";
+            emojiNode.style.left = `${startX}px`;
+            emojiNode.style.top = `${startY}px`;
+            emojiNode.style.pointerEvents = "none";
+            emojiNode.style.zIndex = "10005";
+            emojiNode.style.fontSize = `${Math.random() * 0.7 + 1.2}rem`;
+            emojiNode.style.userSelect = "none";
+            
+            // Add a little glow shadow to emojis
+            emojiNode.style.textShadow = "1px 1px 3px rgba(0,0,0,0.3)";
+
+            document.body.appendChild(emojiNode);
+
+            const animation = emojiNode.animate([
+                {
+                    transform: "translate(-50%, -50%) scale(0) rotate(0deg)",
+                    opacity: 1
+                },
+                {
+                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(1.5) rotate(${Math.random() * 180 - 90}deg)`,
+                    opacity: 1,
+                    offset: 0.5
+                },
+                {
+                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY + 40}px)) scale(0) rotate(${Math.random() * 360 - 180}deg)`,
+                    opacity: 0
+                }
+            ], {
+                duration: 1000 + Math.random() * 300,
+                easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
+                fill: "forwards"
+            });
+
+            animation.onfinish = () => {
+                emojiNode.remove();
+            };
+        }
     }
 }
