@@ -1064,6 +1064,10 @@ h2 {
    About Us (Team) Section Styling
    ========================================================================== */
 
+/* ==========================================================================
+   About Us (Team) Section Styling
+   ========================================================================== */
+
 .about-us {
     padding: 100px 0;
     background-color: var(--body-bg);
@@ -1076,6 +1080,7 @@ h2 {
     grid-template-columns: repeat(4, 1fr);
     gap: 28px;
     margin-top: 16px;
+    position: relative;
 }
 
 .team-card {
@@ -1089,6 +1094,26 @@ h2 {
     flex-direction: column;
     align-items: center;
     transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+    z-index: 1;
+    overflow: visible; /* ensure the bracelet connector is visible stretching out */
+}
+
+/* Elastic cord connecting beads together like a bracelet */
+.team-card::after {
+    content: '';
+    position: absolute;
+    top: 97px; /* matching the vertical center of the 130px bead (32px padding + 65px radius) */
+    left: 50%;
+    width: calc(100% + 28px); /* card width + grid gap */
+    height: 6px;
+    background: repeating-linear-gradient(to right, #ff2a85 0px, #ff2a85 6px, #00e5ff 6px, #00e5ff 12px, #b026ff 12px, #b026ff 18px, #ffd700 18px, #ffd700 24px); /* colorful bracelet elastic string */
+    z-index: 0; /* behind the bead wrapper (which has z-index: 2) */
+    transform: translateY(-50%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.team-card:last-child::after {
+    display: none; /* last card doesn't connect further */
 }
 
 /* Base box shadow for each person's card matching their accent color */
@@ -1132,28 +1157,80 @@ h2 {
     width: 130px;
     height: 130px;
     margin-bottom: 24px;
+    z-index: 2; /* sits on top of the connector string */
 }
 
-.team-avatar {
+/* Glossy 3D plastic bead styles */
+.team-bead {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family);
+    font-size: 3.8rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+    position: relative;
     transition: transform var(--transition-speed);
 }
 
-.team-card:hover .team-avatar {
-    transform: scale(1.05) rotate(2deg);
+/* Color variations for beads using radial gradients for a round 3D plastic ball look */
+.bead-kayla {
+    background: radial-gradient(circle at 35% 35%, #ff7ea7 0%, #ff2a85 70%, #d01460 100%);
+    box-shadow: inset -10px -10px 25px rgba(130, 0, 45, 0.3), inset 10px 10px 25px rgba(255, 255, 255, 0.5), 0 8px 16px rgba(255, 42, 133, 0.2);
 }
 
-/* Badges for roles */
-.role-badge {
+.bead-erika {
+    background: radial-gradient(circle at 35% 35%, #80f2ff 0%, #00e5ff 70%, #00a4cc 100%);
+    box-shadow: inset -10px -10px 25px rgba(0, 100, 120, 0.3), inset 10px 10px 25px rgba(255, 255, 255, 0.5), 0 8px 16px rgba(0, 229, 255, 0.2);
+}
+
+.bead-aria {
+    background: radial-gradient(circle at 35% 35%, #dca6ff 0%, #b026ff 70%, #7c0ccc 100%);
+    box-shadow: inset -10px -10px 25px rgba(80, 0, 130, 0.3), inset 10px 10px 25px rgba(255, 255, 255, 0.5), 0 8px 16px rgba(176, 38, 255, 0.2);
+}
+
+.bead-sora {
+    background: radial-gradient(circle at 35% 35%, #ffea70 0%, #ffd700 70%, #cca300 100%);
+    box-shadow: inset -10px -10px 25px rgba(130, 100, 0, 0.3), inset 10px 10px 25px rgba(255, 255, 255, 0.5), 0 8px 16px rgba(255, 215, 0, 0.25);
+}
+
+/* Wiggle the bead on hover */
+.team-card:hover .team-bead {
+    transform: scale(1.05) rotate(4deg);
+}
+
+/* Left and right threading holes inside each bead */
+.team-bead::before,
+.team-bead::after {
+    content: '';
     position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #050820; /* dark thread hole representation */
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255, 255, 255, 0.15);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.team-bead::before {
+    left: -3px; /* visual hole on left edge */
+}
+
+.team-bead::after {
+    right: -3px; /* visual hole on right edge */
+}
+
+/* Badges for roles - moved below the avatar */
+.role-badge {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 16px;
     white-space: nowrap;
     font-size: 0.75rem;
     font-weight: 800;
@@ -1163,6 +1240,7 @@ h2 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
     font-family: var(--font-family);
     letter-spacing: 0.5px;
+    z-index: 2;
 }
 
 .badge-owner {
@@ -1197,7 +1275,8 @@ h2 {
 }
 
 .team-desc {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     color: var(--text-light);
     line-height: 1.45;
 }
@@ -1207,15 +1286,39 @@ h2 {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
     }
+    .team-card::after {
+        top: 97px;
+        width: calc(100% + 20px);
+    }
+    /* Hide connector on even items in 2-column layout so rows are distinct */
+    .team-card:nth-child(2n)::after {
+        display: none;
+    }
 }
 
 @media (max-width: 576px) {
     .team-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 24px;
     }
     .about-us {
         padding: 60px 0;
+    }
+    /* Vertical bracelet cord connectors for mobile layout stacking */
+    .team-card::after {
+        top: 130px; /* start below avatar wrapper */
+        left: 50%;
+        width: 6px;
+        height: 100px; /* stretches to next card */
+        background: repeating-linear-gradient(to bottom, #ff2a85 0px, #ff2a85 6px, #00e5ff 6px, #00e5ff 12px, #b026ff 12px, #b026ff 18px, #ffd700 18px, #ffd700 24px);
+        transform: translateX(-50%) translateY(0);
+        z-index: 0;
+    }
+    .team-card:last-child::after {
+        display: none;
+    }
+    .team-card:nth-child(2n)::after {
+        display: block; /* enable vertical connector for mobile stacking */
     }
 }
 
