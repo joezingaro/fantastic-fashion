@@ -1196,8 +1196,8 @@ function initTeamFireworks() {
 
             // Determine randomized height (from 120px up to 240px)
             const height = Math.random() * 120 + 120;
-            // Determine slight tilt/angle (between -15 and +15 degrees)
-            const angleOffset = (Math.random() - 0.5) * 0.5; // in radians
+            // Determine wider tilt/angle swing (between -40 and +40 degrees)
+            const angleOffset = (Math.random() - 0.5) * 1.4; // in radians
             const apexX = startX + Math.sin(angleOffset) * height;
             const apexY = startY - Math.cos(angleOffset) * height;
 
