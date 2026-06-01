@@ -1155,12 +1155,31 @@ function initTeamFireworks() {
         aria: ["🎨", "💜", "🔮", "⭐", "💮", "💟", "🪻", "🦄", "🟣"],
         sora: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"]
     };
+    const teamColors = {
+        kayla: "#ff2a85",
+        erika: "#00e5ff",
+        aria: "#b026ff",
+        sora: "#ffd700"
+    };
 
     teamCards.forEach(card => {
         card.addEventListener("click", (e) => {
             const memberId = card.id.replace("team-", ""); // kayla, erika, aria, sora
             const emojis = teamEmojis[memberId];
             if (!emojis) return;
+
+            // Touch AudioContext immediately to guarantee browser permission
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx && !globalAudioCtx) {
+                    globalAudioCtx = new AudioCtx();
+                }
+                if (globalAudioCtx && globalAudioCtx.state === "suspended") {
+                    globalAudioCtx.resume();
+                }
+            } catch (err) {
+                console.warn(err);
+            }
 
             // Get coordinates of the clicked location, or fallback to center of the card
             let startX = e.clientX;
@@ -1173,27 +1192,100 @@ function initTeamFireworks() {
                 startY = rect.top + rect.height / 2;
             }
 
-            // Play pop sound
-            playPopSound();
+            const color = teamColors[memberId] || "#ff2a85";
 
-            // Release 3 bursts spaced out slightly in time
-            const burstCount = 3;
-            for (let b = 0; b < burstCount; b++) {
-                setTimeout(() => {
-                    spawnEmojiBurst(startX, startY, emojis);
-                }, b * 150);
-            }
+            // Create rising rocket element (a bright glowing spark)
+            const rocket = document.createElement("div");
+            rocket.style.position = "fixed";
+            rocket.style.left = `${startX}px`;
+            rocket.style.top = `${startY}px`;
+            rocket.style.width = "7px";
+            rocket.style.height = "7px";
+            rocket.style.borderRadius = "50%";
+            rocket.style.background = "#ffffff";
+            rocket.style.border = `2px solid ${color}`;
+            rocket.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+            rocket.style.pointerEvents = "none";
+            rocket.style.zIndex = "10006";
+            rocket.style.transform = "translate(-50%, -50%)";
+            document.body.appendChild(rocket);
+
+            // Spawn a trail of sparkles behind it during ascent
+            const trailInterval = setInterval(() => {
+                const rect = rocket.getBoundingClientRect();
+                const rx = rect.left + rect.width / 2;
+                const ry = rect.top + rect.height / 2;
+                if (ry > 0) {
+                    spawnTrailSparkle(rx, ry, color);
+                }
+            }, 30);
+
+            // Animate rocket going straight up by 120px
+            const rocketAnim = rocket.animate([
+                { top: `${startY}px`, opacity: 1 },
+                { top: `${startY - 120}px`, opacity: 1 }
+            ], {
+                duration: 380,
+                easing: "ease-out",
+                fill: "forwards"
+            });
+
+            rocketAnim.onfinish = () => {
+                clearInterval(trailInterval);
+                rocket.remove();
+                
+                // Explode at the apex
+                const apexX = startX;
+                const apexY = startY - 120;
+                
+                // Play pop sound
+                playPopSound();
+
+                // Release 3 bursts spaced out slightly in time
+                const burstCount = 3;
+                for (let b = 0; b < burstCount; b++) {
+                    setTimeout(() => {
+                        spawnEmojiBurst(apexX, apexY, emojis);
+                    }, b * 120);
+                }
+            };
         });
     });
 
+    function spawnTrailSparkle(x, y, color) {
+        const spark = document.createElement("div");
+        spark.style.position = "fixed";
+        spark.style.left = `${x}px`;
+        spark.style.top = `${y}px`;
+        spark.style.width = "4px";
+        spark.style.height = "4px";
+        spark.style.borderRadius = "50%";
+        spark.style.background = color;
+        spark.style.boxShadow = `0 0 4px ${color}`;
+        spark.style.pointerEvents = "none";
+        spark.style.zIndex = "10005";
+        spark.style.transform = "translate(-50%, -50%)";
+        document.body.appendChild(spark);
+        
+        const anim = spark.animate([
+            { transform: "translate(-50%, -50%) scale(1.5)", opacity: 0.9 },
+            { transform: "translate(-50%, -50%) scale(0)", opacity: 0 }
+        ], {
+            duration: 250,
+            easing: "ease-out"
+        });
+        
+        anim.onfinish = () => spark.remove();
+    }
+
     function spawnEmojiBurst(startX, startY, emojiPool) {
-        const count = 10; // Number of emojis in each burst
+        const count = 12; // Number of emojis in each burst
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 90 + 40;
+            const distance = Math.random() * 110 + 40; // Wide dispersion
             const destX = Math.cos(angle) * distance;
-            // Negative start velocity, floats up then falls a bit
-            const destY = Math.sin(angle) * distance - 25; 
+            // Float upward slightly then drift downward with gravity
+            const destY = Math.sin(angle) * distance - 30; 
 
             const emojiNode = document.createElement("div");
             emojiNode.innerText = emojiPool[Math.floor(Math.random() * emojiPool.length)];
@@ -1202,31 +1294,33 @@ function initTeamFireworks() {
             emojiNode.style.top = `${startY}px`;
             emojiNode.style.pointerEvents = "none";
             emojiNode.style.zIndex = "10005";
-            emojiNode.style.fontSize = `${Math.random() * 0.7 + 1.2}rem`;
+            // Smaller size for a cuter/neater look
+            emojiNode.style.fontSize = `${Math.random() * 0.4 + 0.7}rem`;
             emojiNode.style.userSelect = "none";
             
-            // Add a little glow shadow to emojis
+            // Subtle glow shadow for depth
             emojiNode.style.textShadow = "1px 1px 3px rgba(0,0,0,0.3)";
 
             document.body.appendChild(emojiNode);
 
+            // Longer duration, expand quickly, float further, and slowly fade out
             const animation = emojiNode.animate([
                 {
                     transform: "translate(-50%, -50%) scale(0) rotate(0deg)",
                     opacity: 1
                 },
                 {
-                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(1.5) rotate(${Math.random() * 180 - 90}deg)`,
+                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(1.2) rotate(${Math.random() * 180 - 90}deg)`,
                     opacity: 1,
-                    offset: 0.5
+                    offset: 0.35
                 },
                 {
-                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY + 40}px)) scale(0) rotate(${Math.random() * 360 - 180}deg)`,
+                    transform: `translate(calc(-50% + ${destX * 1.15}px), calc(-50% + ${destY + 50}px)) scale(0.6) rotate(${Math.random() * 360 - 180}deg)`,
                     opacity: 0
                 }
             ], {
-                duration: 1000 + Math.random() * 300,
-                easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
+                duration: 1800 + Math.random() * 500, // 1.8s to 2.3s for slow, magical fade
+                easing: "cubic-bezier(0.1, 0.8, 0.25, 1)",
                 fill: "forwards"
             });
 
