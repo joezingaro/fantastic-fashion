@@ -1194,6 +1194,13 @@ function initTeamFireworks() {
 
             const color = teamColors[memberId] || "#ff2a85";
 
+            // Determine randomized height (from 120px up to 240px)
+            const height = Math.random() * 120 + 120;
+            // Determine slight tilt/angle (between -15 and +15 degrees)
+            const angleOffset = (Math.random() - 0.5) * 0.5; // in radians
+            const apexX = startX + Math.sin(angleOffset) * height;
+            const apexY = startY - Math.cos(angleOffset) * height;
+
             // Create rising rocket element (a bright glowing spark)
             const rocket = document.createElement("div");
             rocket.style.position = "fixed";
@@ -1218,14 +1225,14 @@ function initTeamFireworks() {
                 if (ry > 0) {
                     spawnTrailSparkle(rx, ry, color);
                 }
-            }, 30);
+            }, 25);
 
-            // Animate rocket going straight up by 120px
+            // Animate rocket going to randomized apex (with slight tilt)
             const rocketAnim = rocket.animate([
-                { top: `${startY}px`, opacity: 1 },
-                { top: `${startY - 120}px`, opacity: 1 }
+                { left: `${startX}px`, top: `${startY}px`, opacity: 1 },
+                { left: `${apexX}px`, top: `${apexY}px`, opacity: 1 }
             ], {
-                duration: 380,
+                duration: 350 + (height / 120) * 150, // 350ms to 500ms depending on height
                 easing: "ease-out",
                 fill: "forwards"
             });
@@ -1233,10 +1240,6 @@ function initTeamFireworks() {
             rocketAnim.onfinish = () => {
                 clearInterval(trailInterval);
                 rocket.remove();
-                
-                // Explode at the apex
-                const apexX = startX;
-                const apexY = startY - 120;
                 
                 // Play pop sound
                 playPopSound();
@@ -1246,7 +1249,7 @@ function initTeamFireworks() {
                 for (let b = 0; b < burstCount; b++) {
                     setTimeout(() => {
                         spawnEmojiBurst(apexX, apexY, emojis);
-                    }, b * 120);
+                    }, b * 150);
                 }
             };
         });
@@ -1282,10 +1285,10 @@ function initTeamFireworks() {
         const count = 12; // Number of emojis in each burst
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 110 + 40; // Wide dispersion
+            const distance = Math.random() * 120 + 50; // Wide dispersion
             const destX = Math.cos(angle) * distance;
             // Float upward slightly then drift downward with gravity
-            const destY = Math.sin(angle) * distance - 30; 
+            const destY = Math.sin(angle) * distance - 35; 
 
             const emojiNode = document.createElement("div");
             emojiNode.innerText = emojiPool[Math.floor(Math.random() * emojiPool.length)];
@@ -1303,7 +1306,8 @@ function initTeamFireworks() {
 
             document.body.appendChild(emojiNode);
 
-            // Longer duration, expand quickly, float further, and slowly fade out
+            // Much slower explosion: 2.5s to 3.3s total duration.
+            // Emojis expand quickly (offset 0.18) and spend 82% of time drifting slowly and fading.
             const animation = emojiNode.animate([
                 {
                     transform: "translate(-50%, -50%) scale(0) rotate(0deg)",
@@ -1312,15 +1316,15 @@ function initTeamFireworks() {
                 {
                     transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(1.2) rotate(${Math.random() * 180 - 90}deg)`,
                     opacity: 1,
-                    offset: 0.35
+                    offset: 0.18
                 },
                 {
-                    transform: `translate(calc(-50% + ${destX * 1.15}px), calc(-50% + ${destY + 50}px)) scale(0.6) rotate(${Math.random() * 360 - 180}deg)`,
+                    transform: `translate(calc(-50% + ${destX * 1.15}px), calc(-50% + ${destY + 60}px)) scale(0.5) rotate(${Math.random() * 360 - 180}deg)`,
                     opacity: 0
                 }
             ], {
-                duration: 1800 + Math.random() * 500, // 1.8s to 2.3s for slow, magical fade
-                easing: "cubic-bezier(0.1, 0.8, 0.25, 1)",
+                duration: 2500 + Math.random() * 800,
+                easing: "cubic-bezier(0.05, 0.8, 0.15, 1)", // fast explode, super long slow drift
                 fill: "forwards"
             });
 
