@@ -1061,6 +1061,165 @@ h2 {
 }
 
 /* ==========================================================================
+   About Us (Team) Section Styling
+   ========================================================================== */
+
+.about-us {
+    padding: 100px 0;
+    background-color: var(--body-bg);
+    position: relative;
+    border-bottom: 2px dashed rgba(255, 42, 133, 0.1);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+    margin-top: 16px;
+}
+
+.team-card {
+    background: #ffffff;
+    border-radius: var(--border-radius);
+    padding: 32px 24px;
+    text-align: center;
+    border: 3px solid #ffffff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+}
+
+/* Base box shadow for each person's card matching their accent color */
+#team-kayla {
+    box-shadow: 0 8px 24px rgba(255, 42, 133, 0.05), 0 0 0 1px rgba(255, 42, 133, 0.05);
+}
+#team-erika {
+    box-shadow: 0 8px 24px rgba(0, 229, 255, 0.05), 0 0 0 1px rgba(0, 229, 255, 0.05);
+}
+#team-aria {
+    box-shadow: 0 8px 24px rgba(176, 38, 255, 0.05), 0 0 0 1px rgba(176, 38, 255, 0.05);
+}
+#team-sora {
+    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.05), 0 0 0 1px rgba(255, 215, 0, 0.05);
+}
+
+/* Hover effects with colored glows */
+.team-card:hover {
+    transform: translateY(-8px);
+}
+
+#team-kayla:hover {
+    box-shadow: 0 12px 30px rgba(255, 42, 133, 0.18), 0 0 12px rgba(255, 42, 133, 0.1);
+    border-color: rgba(255, 42, 133, 0.2);
+}
+#team-erika:hover {
+    box-shadow: 0 12px 30px rgba(0, 229, 255, 0.18), 0 0 12px rgba(0, 229, 255, 0.1);
+    border-color: rgba(0, 229, 255, 0.2);
+}
+#team-aria:hover {
+    box-shadow: 0 12px 30px rgba(176, 38, 255, 0.18), 0 0 12px rgba(176, 38, 255, 0.1);
+    border-color: rgba(176, 38, 255, 0.2);
+}
+#team-sora:hover {
+    box-shadow: 0 12px 30px rgba(255, 215, 0, 0.18), 0 0 12px rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.25);
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin-bottom: 24px;
+}
+
+.team-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform var(--transition-speed);
+}
+
+.team-card:hover .team-avatar {
+    transform: scale(1.05) rotate(2deg);
+}
+
+/* Badges for roles */
+.role-badge {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    font-family: var(--font-family);
+    letter-spacing: 0.5px;
+}
+
+.badge-owner {
+    background-color: rgba(255, 42, 133, 0.08);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.badge-manager {
+    background-color: rgba(0, 229, 255, 0.08);
+    color: #00b0ff;
+    border: 2px solid #00e5ff;
+}
+
+.badge-employee-aria {
+    background-color: rgba(176, 38, 255, 0.08);
+    color: #9c27b0;
+    border: 2px solid #b026ff;
+}
+
+.badge-employee-sora {
+    background-color: rgba(255, 215, 0, 0.08);
+    color: #e65100;
+    border: 2px solid #ffd700;
+}
+
+.team-info h3 {
+    font-family: var(--font-family);
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.team-desc {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    line-height: 1.45;
+}
+
+@media (max-width: 992px) {
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .about-us {
+        padding: 60px 0;
+    }
+}
+
+/* ==========================================================================
    Contact Section Styling
    ========================================================================== */
 
@@ -1622,12 +1781,14 @@ footer p:first-child {
 }
 
 .rainbow-shimmer-active .products,
+.rainbow-shimmer-active .about-us,
 .rainbow-shimmer-active .secret-coupon-section,
 .rainbow-shimmer-active .contact {
     background-color: transparent !important;
 }
 
 .rainbow-shimmer-active .product-card,
+.rainbow-shimmer-active .team-card,
 .rainbow-shimmer-active .contact-card,
 .rainbow-shimmer-active .modal-card,
 .rainbow-shimmer-active .coupon-reveal-card,
@@ -1643,6 +1804,7 @@ footer p:first-child {
 }
 
 .rainbow-shimmer-active .product-card::before,
+.rainbow-shimmer-active .team-card::before,
 .rainbow-shimmer-active .contact-card::before,
 .rainbow-shimmer-active .modal-card::before,
 .rainbow-shimmer-active .coupon-reveal-card::before,
@@ -1676,6 +1838,10 @@ footer p:first-child {
     border-radius: 20px;
 }
 
+.rainbow-shimmer-active .team-card::before {
+    border-radius: 20px;
+}
+
 .rainbow-shimmer-active .gift-box-container::before,
 .rainbow-shimmer-active .gift-container::before {
     border-radius: 20px;
@@ -1685,6 +1851,8 @@ footer p:first-child {
 .rainbow-shimmer-active .product-info h3,
 .rainbow-shimmer-active .product-description,
 .rainbow-shimmer-active .product-price,
+.rainbow-shimmer-active .team-info h3,
+.rainbow-shimmer-active .team-desc,
 .rainbow-shimmer-active .contact-card h2,
 .rainbow-shimmer-active .contact-card p,
 .rainbow-shimmer-active .form-group label,
@@ -1697,6 +1865,28 @@ footer p:first-child {
 .rainbow-shimmer-active .coupon-reveal-card .coupon-subtext {
     color: #ffffff !important;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Custom role badge styles in rainbow mode inside cards */
+.rainbow-shimmer-active .role-badge {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+.rainbow-shimmer-active .badge-owner {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+.rainbow-shimmer-active .badge-manager {
+    color: #00e5ff !important;
+    border-color: #00e5ff !important;
+}
+.rainbow-shimmer-active .badge-employee-aria {
+    color: #b026ff !important;
+    border-color: #b026ff !important;
+}
+.rainbow-shimmer-active .badge-employee-sora {
+    color: #ffd700 !important;
+    border-color: #ffd700 !important;
 }
 
 /* Dark navy overrides for text directly on the sky blue background */
