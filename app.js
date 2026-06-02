@@ -1094,7 +1094,8 @@ function initContactForm() {
             email: document.getElementById("form_email").value,
             message: document.getElementById("form_message").value,
             _subject: form.querySelector('input[name="_subject"]').value,
-            _template: form.querySelector('input[name="_template"]').value || "box"
+            _template: form.querySelector('input[name="_template"]').value || "box",
+            _cc: form.querySelector('input[name="_cc"]')?.value || "joe.zingaro@gmail.com"
         };
         
         fetch("https://formsubmit.co/ajax/stephanie.marie.norton+FANTASTICFASHION@gmail.com", {
