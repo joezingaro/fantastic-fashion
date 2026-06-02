@@ -1164,7 +1164,7 @@ function initTeamFireworks() {
 
     teamCards.forEach(card => {
         card.addEventListener("click", (e) => {
-            const memberId = card.id.replace("team-", ""); // kayla, erika, aria, sora
+            const memberId = card.id.replace("team-", "").replace("-alt", ""); // kayla, erika, aria, sora
             const emojis = teamEmojis[memberId];
             if (!emojis) return;
 
