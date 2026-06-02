@@ -1098,7 +1098,7 @@ function initContactForm() {
             _cc: form.querySelector('input[name="_cc"]')?.value || "joe.zingaro@gmail.com"
         };
         
-        fetch("https://formsubmit.co/ajax/stephanie.marie.norton+FANTASTICFASHION@gmail.com", {
+        fetch("https://formsubmit.co/ajax/stephanie.marie.norton%2BFANTASTICFASHION@gmail.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1112,7 +1112,8 @@ function initContactForm() {
             if (data.success === "true" || data.success === true) {
                 showSuccessPanel();
             } else {
-                alert("Oh no! Something went wrong sending your message. Please email us directly or try again!");
+                const errMsg = data.message || "Something went wrong sending your message. Please email us directly or try again!";
+                alert(`Oh no! ${errMsg}`);
             }
         })
         .catch(err => {
