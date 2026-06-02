@@ -878,6 +878,73 @@ function createConfetti(container) {
     }
 }
 
+function playSuccessSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        
+        if (!globalAudioCtx) {
+            globalAudioCtx = new AudioCtx();
+        }
+        
+        if (globalAudioCtx.state === "suspended") {
+            globalAudioCtx.resume();
+        }
+        
+        const now = globalAudioCtx.currentTime;
+        
+        // Sparkling quick ascending arpeggio (E5, G5, C6, E6)
+        const notes = [659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+            const osc = globalAudioCtx.createOscillator();
+            const gain = globalAudioCtx.createGain();
+            
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            
+            gain.gain.setValueAtTime(0, now + idx * 0.08);
+            gain.gain.linearRampToValueAtTime(0.15, now + idx * 0.08 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.4);
+            
+            osc.connect(gain);
+            gain.connect(globalAudioCtx.destination);
+            
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.45);
+        });
+    } catch (e) {
+        console.log("Success sound error:", e);
+    }
+}
+
+function triggerStarsShower(container) {
+    if (!container) return;
+    container.innerHTML = "";
+    
+    const colors = ["#ff2a85", "#00e5ff", "#ffff00", "#ffd700", "#ff9d00", "#b026ff", "#ffffff"];
+    const symbols = ["★", "✨", "🌸", "💖", "⭐", "💫"];
+    const count = 35; // a dense magical shower!
+    
+    for (let i = 0; i < count; i++) {
+        const star = document.createElement("div");
+        star.className = "falling-star-piece";
+        star.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        star.style.color = colors[Math.floor(Math.random() * colors.length)];
+        star.style.left = `${Math.random() * 90 + 5}%`;
+        star.style.top = `-20px`;
+        star.style.animationDelay = `${Math.random() * 1.2}s`;
+        star.style.animationDuration = `${Math.random() * 1.5 + 2.0}s`;
+        
+        // Add random text-shadow for glowing stars
+        if (Math.random() > 0.4) {
+            const color = star.style.color;
+            star.style.textShadow = `0 0 8px ${color}, 0 0 15px ${color}`;
+        }
+        
+        container.appendChild(star);
+    }
+}
+
 /* ==========================================================================
    7. Theme Customizer Panel Interactions
    ========================================================================== */
@@ -1129,6 +1196,18 @@ function initContactForm() {
         successMsg.classList.remove("show");
         form.style.opacity = "1";
         form.style.pointerEvents = "auto";
+        
+        // Reset success state elements
+        const starsShower = document.getElementById("success-stars-shower");
+        if (starsShower) starsShower.innerHTML = "";
+        
+        const successHeader = document.getElementById("success-header");
+        const successBody = document.getElementById("success-body");
+        const successIconEmoji = document.getElementById("success-icon-emoji");
+        
+        if (successHeader) successHeader.innerText = "Message Sent Successfully!";
+        if (successBody) successBody.innerText = "Yay! Thank you so much for supporting Fantastic Fashion. Kayla and Erika will look at your message and reply back to your email address soon!";
+        if (successIconEmoji) successIconEmoji.innerText = "🎉";
     });
     
     function setSubmittingState(isSubmitting) {
@@ -1145,11 +1224,30 @@ function initContactForm() {
     }
     
     function showSuccessPanel() {
+        const nameVal = document.getElementById("form_name").value.trim();
+        const successHeader = document.getElementById("success-header");
+        const successBody = document.getElementById("success-body");
+        const successIconEmoji = document.getElementById("success-icon-emoji");
+        
+        if (successHeader && nameVal) {
+            successHeader.innerText = `Thanks, ${nameVal}! ✨`;
+        }
+        if (successBody && nameVal) {
+            successBody.innerText = `Yay! Thank you so much for supporting Fantastic Fashion, ${nameVal}. Kayla and Erika have received your message and will reply back to your email address soon!`;
+        }
+        if (successIconEmoji) {
+            successIconEmoji.innerText = "💖";
+        }
+        
         successMsg.classList.add("show");
         form.style.opacity = "0";
         form.style.pointerEvents = "none";
         
-        createConfetti(document.getElementById("confetti-container"));
+        // Play quick success chime sound
+        playSuccessSound();
+        
+        // Trigger the falling stars shower
+        triggerStarsShower(document.getElementById("success-stars-shower"));
     }
 }
 

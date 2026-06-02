@@ -272,10 +272,13 @@
                     
                     <!-- Custom Form Success Message (Hidden by default) -->
                     <div class="success-message" id="success-message">
-                        <div class="success-icon">🎉</div>
-                        <h3>Message Sent Successfully!</h3>
-                        <p>Yay! Thank you so much for supporting Fantastic Fashion. Kayla and Erika will look at your message and reply back to your email address soon!</p>
-                        <button class="reset-form-btn" id="reset-form-btn">Send Another Message</button>
+                        <div class="stars-shower-container" id="success-stars-shower"></div>
+                        <div class="success-content" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%;">
+                            <div class="success-icon" id="success-icon-emoji">🎉</div>
+                            <h3 id="success-header">Message Sent Successfully!</h3>
+                            <p id="success-body">Yay! Thank you so much for supporting Fantastic Fashion. Kayla and Erika will look at your message and reply back to your email address soon!</p>
+                            <button class="reset-form-btn" id="reset-form-btn">Send Another Message</button>
+                        </div>
                     </div>
                 </div>
             </div>
