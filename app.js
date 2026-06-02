@@ -1056,6 +1056,13 @@ function initContactForm() {
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         
+        // Dynamically update the subject line with the user's name
+        const nameVal = document.getElementById("form_name").value;
+        const subjectInput = form.querySelector('input[name="_subject"]');
+        if (subjectInput) {
+            subjectInput.value = `[Fantastic Fashion] New Message from ${nameVal} ✨`;
+        }
+        
         // 1. Honeypot check
         const honeypotVal = document.getElementById("form_website").value;
         if (honeypotVal) {
@@ -1083,10 +1090,11 @@ function initContactForm() {
         setSubmittingState(true);
         
         const formData = {
-            name: document.getElementById("form_name").value,
+            name: nameVal,
             email: document.getElementById("form_email").value,
             message: document.getElementById("form_message").value,
-            _subject: form.querySelector('input[name="_subject"]').value
+            _subject: form.querySelector('input[name="_subject"]').value,
+            _template: form.querySelector('input[name="_template"]').value || "box"
         };
         
         fetch("https://formsubmit.co/ajax/stephanie.marie.norton+FANTASTICFASHION@gmail.com", {
