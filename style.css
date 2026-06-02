@@ -1140,10 +1140,22 @@ h2 {
     height: 130px;
     margin-bottom: 24px;
     border-radius: 50%;
-    border: 4px solid #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    border: 2.5px solid #ffffff; /* slight white matt inside */
     overflow: hidden;
     z-index: 2; /* sits on top of the connector string */
+}
+
+#team-kayla .avatar-wrapper {
+    box-shadow: 0 0 0 3px #ff2a85; /* fuchsia solid outer border */
+}
+#team-erika .avatar-wrapper {
+    box-shadow: 0 0 0 3px #00e5ff; /* turquoise solid outer border */
+}
+#team-aria .avatar-wrapper {
+    box-shadow: 0 0 0 3px #b026ff; /* violet solid outer border */
+}
+#team-sora .avatar-wrapper {
+    box-shadow: 0 0 0 3px #ffd700; /* gold solid outer border */
 }
 
 /* Glossy 3D plastic bead styles */
@@ -1157,9 +1169,8 @@ h2 {
     font-family: var(--font-family);
     font-size: 3.8rem;
     font-weight: 900;
-    /* Sunken/engraved letter styling */
-    color: rgba(0, 0, 0, 0.22);
-    text-shadow: -2px -2px 3px rgba(0, 0, 0, 0.65), 1.5px 1.5px 2px rgba(255, 255, 255, 0.45);
+    color: #ffffff; /* clean white letters */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45), -1px -1px 2px rgba(0, 0, 0, 0.2);
     position: relative;
     transition: transform var(--transition-speed);
 }
@@ -1253,115 +1264,7 @@ h2 {
     line-height: 1.45;
 }
 
-/* Alternative Bead Background Card Styling */
-.team-card-bead-bg {
-    position: relative;
-    padding: 0 !important; /* remove padding to let image stretch edge-to-edge */
-    height: 320px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    border: 3px solid #ffffff;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed), background-size 0.5s ease !important;
-}
 
-#team-kayla-alt {
-    background-image: url('assets/avatar_kayla.png');
-    background-size: 110%;
-    background-position: center;
-    box-shadow: 0 8px 24px rgba(255, 42, 133, 0.08), inset 0 0 40px rgba(0, 0, 0, 0.2);
-}
-#team-erika-alt {
-    background-image: url('assets/avatar_erika.png');
-    background-size: 110%;
-    background-position: center;
-    box-shadow: 0 8px 24px rgba(0, 229, 255, 0.08), inset 0 0 40px rgba(0, 0, 0, 0.2);
-}
-#team-aria-alt {
-    background-image: url('assets/avatar_aria.png');
-    background-size: 110%;
-    background-position: center;
-    box-shadow: 0 8px 24px rgba(176, 38, 255, 0.08), inset 0 0 40px rgba(0, 0, 0, 0.2);
-}
-#team-sora-alt {
-    background-image: url('assets/avatar_sora.png');
-    background-size: 110%;
-    background-position: center;
-    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.08), inset 0 0 40px rgba(0, 0, 0, 0.2);
-}
-
-/* Hover effects for alternative card backgrounds */
-.team-card-bead-bg:hover {
-    background-size: 125% !important; /* smooth zooming in on the beads! */
-    transform: translateY(-8px) scale(1.02);
-}
-#team-kayla-alt:hover {
-    box-shadow: 0 16px 36px rgba(255, 42, 133, 0.25), inset 0 0 20px rgba(255, 42, 133, 0.2);
-    border-color: rgba(255, 42, 133, 0.3);
-}
-#team-erika-alt:hover {
-    box-shadow: 0 16px 36px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 229, 255, 0.2);
-    border-color: rgba(0, 229, 255, 0.3);
-}
-#team-aria-alt:hover {
-    box-shadow: 0 16px 36px rgba(176, 38, 255, 0.25), inset 0 0 20px rgba(176, 38, 255, 0.2);
-    border-color: rgba(176, 38, 255, 0.3);
-}
-#team-sora-alt:hover {
-    box-shadow: 0 16px 36px rgba(255, 215, 0, 0.28), inset 0 0 20px rgba(255, 215, 0, 0.2);
-    border-color: rgba(255, 215, 0, 0.35);
-}
-
-/* Giant sunken letter inside alt cards */
-.giant-sunken-letter {
-    font-family: var(--font-family);
-    font-size: 8.5rem;
-    font-weight: 900;
-    margin-top: 16px;
-    user-select: none;
-    line-height: 1;
-    /* Imprinted / sunken letter styling */
-    color: rgba(0, 0, 0, 0.28);
-    text-shadow: -3px -3px 4px rgba(0, 0, 0, 0.7), 2px 2px 3px rgba(255, 255, 255, 0.4);
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), color var(--transition-speed), text-shadow var(--transition-speed);
-}
-
-.team-card-bead-bg:hover .giant-sunken-letter {
-    transform: scale(1.15) rotate(-5deg);
-    /* Make it look like it's glowing slightly from within when hovered */
-    color: rgba(255, 255, 255, 0.2) !important;
-    text-shadow: -1px -1px 2px rgba(0, 0, 0, 0.5), 1px 1px 2px rgba(255, 255, 255, 0.35), 0 0 20px rgba(255, 255, 255, 0.25) !important;
-}
-
-/* Glassmorphic banner footer inside alt cards */
-.team-info-alt {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    z-index: 2;
-}
-
-.team-info-alt h3 {
-    font-family: var(--font-family);
-    font-size: 1.3rem;
-    color: var(--text-dark);
-    margin: 0;
-}
-
-.team-info-alt .role-badge {
-    margin-bottom: 0 !important;
-    padding: 4px 10px !important;
-}
 
 @media (max-width: 992px) {
     .team-grid {
@@ -2050,39 +1953,7 @@ footer p:first-child {
     border-color: #ffd700 !important;
 }
 
-/* Rainbow mode overrides for the bead background cards */
-.rainbow-shimmer-active .team-card-bead-bg {
-    position: relative;
-    border: none !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 42, 133, 0.15) !important;
-}
-.rainbow-shimmer-active #team-kayla-alt {
-    background-image: linear-gradient(rgba(10, 15, 45, 0.75), rgba(10, 15, 45, 0.75)), url('assets/avatar_kayla.png') !important;
-    background-size: cover !important;
-}
-.rainbow-shimmer-active #team-erika-alt {
-    background-image: linear-gradient(rgba(10, 15, 45, 0.75), rgba(10, 15, 45, 0.75)), url('assets/avatar_erika.png') !important;
-    background-size: cover !important;
-}
-.rainbow-shimmer-active #team-aria-alt {
-    background-image: linear-gradient(rgba(10, 15, 45, 0.75), rgba(10, 15, 45, 0.75)), url('assets/avatar_aria.png') !important;
-    background-size: cover !important;
-}
-.rainbow-shimmer-active #team-sora-alt {
-    background-image: linear-gradient(rgba(10, 15, 45, 0.75), rgba(10, 15, 45, 0.75)), url('assets/avatar_sora.png') !important;
-    background-size: cover !important;
-}
-.rainbow-shimmer-active .team-info-alt {
-    background: rgba(15, 23, 50, 0.8) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-.rainbow-shimmer-active .team-info-alt h3 {
-    color: #ffffff !important;
-}
-.rainbow-shimmer-active .giant-sunken-letter {
-    color: rgba(255, 255, 255, 0.18) !important;
-    text-shadow: -2px -2px 3px rgba(0, 0, 0, 0.8), 2px 2px 3px rgba(255, 255, 255, 0.25) !important;
-}
+
 
 /* Dark navy overrides for text directly on the sky blue background */
 .rainbow-shimmer-active .section-tagline,
