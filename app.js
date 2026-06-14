@@ -1261,13 +1261,15 @@ function initTeamFireworks() {
         kayla: ["👑", "💖", "🌸", "⭐", "⚪", "💕", "🌺", "🎀", "💝"],
         erika: ["🪄", "🩵", "💎", "⭐", "🫧", "💙", "💠", "✨", "🌀"],
         aria: ["🎨", "💜", "🔮", "⭐", "💮", "💟", "🪻", "🦄", "🟣"],
-        sora: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"]
+        sora: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"],
+        francesca: ["🍀", "💚", "🍃", "⭐", "🦖", "❇️", "🌿", "🥑", "🟢"]
     };
     const teamColors = {
         kayla: "#ff2a85",
         erika: "#00e5ff",
         aria: "#b026ff",
-        sora: "#ffd700"
+        sora: "#ffd700",
+        francesca: "#2ecc71"
     };
 
     teamCards.forEach(card => {

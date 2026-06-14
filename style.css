@@ -1077,7 +1077,7 @@ h2 {
 
 .team-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 28px;
     margin-top: 16px;
     position: relative;
@@ -1111,6 +1111,9 @@ h2 {
 #team-sora {
     box-shadow: 0 8px 24px rgba(255, 215, 0, 0.05), 0 0 0 1px rgba(255, 215, 0, 0.05);
 }
+#team-francesca {
+    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.05), 0 0 0 1px rgba(46, 204, 113, 0.05);
+}
 
 /* Hover effects with colored glows */
 .team-card:hover {
@@ -1132,6 +1135,10 @@ h2 {
 #team-sora:hover {
     box-shadow: 0 12px 30px rgba(255, 215, 0, 0.18), 0 0 12px rgba(255, 215, 0, 0.1);
     border-color: rgba(255, 215, 0, 0.25);
+}
+#team-francesca:hover {
+    box-shadow: 0 12px 30px rgba(46, 204, 113, 0.18), 0 0 12px rgba(46, 204, 113, 0.1);
+    border-color: rgba(46, 204, 113, 0.2);
 }
 
 .avatar-wrapper {
@@ -1156,6 +1163,9 @@ h2 {
 }
 #team-sora .avatar-wrapper {
     box-shadow: 0 0 0 3px #ffd700; /* gold solid outer border */
+}
+#team-francesca .avatar-wrapper {
+    box-shadow: 0 0 0 3px #2ecc71; /* green solid outer border */
 }
 
 /* Glossy 3D plastic bead styles */
@@ -1204,6 +1214,13 @@ h2 {
     box-shadow: inset -10px -10px 25px rgba(130, 100, 0, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
 }
 
+.bead-francesca {
+    background-image: url('assets/avatar_francesca.png');
+    background-size: cover;
+    background-position: center;
+    box-shadow: inset -10px -10px 25px rgba(20, 100, 50, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
+}
+
 /* Wiggle the bead on hover */
 .team-card:hover .team-bead {
     transform: scale(1.05) rotate(4deg);
@@ -1248,6 +1265,12 @@ h2 {
     background-color: rgba(255, 215, 0, 0.08);
     color: #e65100;
     border: 2px solid #ffd700;
+}
+
+.badge-employee-francesca {
+    background-color: rgba(46, 204, 113, 0.08);
+    color: #27ae60;
+    border: 2px solid #2ecc71;
 }
 
 .team-info h3 {
@@ -1991,6 +2014,10 @@ footer p:first-child {
 .rainbow-shimmer-active .badge-employee-sora {
     color: #ffd700 !important;
     border-color: #ffd700 !important;
+}
+.rainbow-shimmer-active .badge-employee-francesca {
+    color: #2ecc71 !important;
+    border-color: #2ecc71 !important;
 }
 
 
