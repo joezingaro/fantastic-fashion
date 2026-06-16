@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initCustomizer();
     initContactForm();
     initTeamFireworks();
+    initProductCarousels();
 });
 
 /* ==========================================================================
@@ -1444,3 +1445,80 @@ function initTeamFireworks() {
         }
     }
 }
+
+/* ==========================================================================
+   10. Product Carousels
+   ========================================================================== */
+
+function initProductCarousels() {
+    const carousels = [
+        { trackId: "track-bracelets", dotsId: "dots-bracelets" },
+        { trackId: "track-earrings", dotsId: "dots-earrings" }
+    ];
+
+    carousels.forEach(carousel => {
+        const track = document.getElementById(carousel.trackId);
+        const dotsContainer = document.getElementById(carousel.dotsId);
+        if (!track || !dotsContainer) return;
+
+        const card = track.closest(".product-card");
+        if (!card) return;
+
+        const prevBtn = card.querySelector(".prev-btn");
+        const nextBtn = card.querySelector(".next-btn");
+        const dots = dotsContainer.querySelectorAll(".carousel-dot");
+
+        // Helper to update active dot based on scroll position
+        function updateActiveDot() {
+            const index = Math.round(track.scrollLeft / track.clientWidth);
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add("active");
+                } else {
+                    dot.classList.remove("active");
+                }
+            });
+        }
+
+        // Scroll logic for prev/next buttons
+        if (prevBtn) {
+            prevBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                track.scrollLeft -= track.clientWidth;
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                track.scrollLeft += track.clientWidth;
+            });
+        }
+
+        // Click logic for dot indicators
+        dots.forEach(dot => {
+            dot.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const slideIndex = parseInt(dot.getAttribute("data-slide"));
+                track.scrollLeft = slideIndex * track.clientWidth;
+            });
+        });
+
+        // Listen to scroll to update dots dynamically (e.g. mobile swipe)
+        let scrollTimeout;
+        track.addEventListener("scroll", () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(updateActiveDot, 100);
+        });
+
+        // Initial update and resize handler (to ensure correct offset on resize)
+        window.addEventListener("resize", () => {
+            const activeDot = dotsContainer.querySelector(".carousel-dot.active");
+            if (activeDot) {
+                const activeIndex = parseInt(activeDot.getAttribute("data-slide"));
+                track.scrollLeft = activeIndex * track.clientWidth;
+            }
+        });
+    });
+}
+

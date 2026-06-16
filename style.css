@@ -630,18 +630,135 @@ h2 {
     background-color: #eaeaea;
 }
 
-.product-image {
+/* Scroll-Snapping Carousel Track */
+.carousel-track {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+
+.carousel-track::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.carousel-track .product-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    scroll-snap-align: start;
     object-fit: cover;
     transition: transform var(--transition-speed);
 }
 
-.product-card:hover .product-image {
+.product-card:hover .carousel-track .product-image {
     transform: scale(1.05);
+}
+
+/* Carousel Overlay Buttons */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid currentColor;
+    font-size: 1.4rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s, background-color 0.3s, color 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-btn:hover {
+    background: #ffffff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.prev-btn {
+    left: 12px;
+    padding-right: 2px;
+}
+
+.next-btn {
+    right: 12px;
+    padding-left: 2px;
+}
+
+/* Show buttons on hover */
+.product-card:hover .carousel-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Custom button colors matching card themes */
+#card-bracelets .carousel-btn {
+    color: var(--primary-color);
+}
+
+#card-earrings .carousel-btn {
+    color: #ff9d00;
+}
+
+/* Carousel Dots Indicator */
+.carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+
+.product-card:hover .carousel-dots {
+    opacity: 1;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.carousel-dot.active {
+    transform: scale(1.25);
+}
+
+#card-bracelets .carousel-dot.active {
+    background: var(--primary-color);
+    box-shadow: 0 0 6px var(--primary-color);
+}
+
+#card-earrings .carousel-dot.active {
+    background: #ff9d00;
+    box-shadow: 0 0 6px #ff9d00;
 }
 
 .product-tag {
