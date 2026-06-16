@@ -1480,18 +1480,28 @@ function initProductCarousels() {
             });
         }
 
-        // Scroll logic for prev/next buttons
+        // Scroll logic for prev/next buttons (with infinite wrap-around)
         if (prevBtn) {
             prevBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                track.scrollLeft -= track.clientWidth;
+                const index = Math.round(track.scrollLeft / track.clientWidth);
+                if (index <= 0) {
+                    track.scrollLeft = (dots.length - 1) * track.clientWidth;
+                } else {
+                    track.scrollLeft -= track.clientWidth;
+                }
             });
         }
 
         if (nextBtn) {
             nextBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                track.scrollLeft += track.clientWidth;
+                const index = Math.round(track.scrollLeft / track.clientWidth);
+                if (index >= dots.length - 1) {
+                    track.scrollLeft = 0;
+                } else {
+                    track.scrollLeft += track.clientWidth;
+                }
             });
         }
 
