@@ -1166,7 +1166,7 @@ function initContactForm() {
             _cc: form.querySelector('input[name="_cc"]')?.value || "joe.zingaro@gmail.com"
         };
         
-        fetch("https://formsubmit.co/ajax/order@fantasticfashions.ca", {
+        fetch("https://formsubmit.co/ajax/stephanie.marie.norton%2BFANTASTICFASHION@gmail.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
