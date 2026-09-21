@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fantastic Fashion Interactive Engine - Reverted & Optimized Trail
+   Fantastic Fashions Interactive Engine - Reverted & Optimized Trail
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1128,7 +1128,7 @@ function initContactForm() {
         const nameVal = document.getElementById("form_name").value;
         const subjectInput = form.querySelector('input[name="_subject"]');
         if (subjectInput) {
-            subjectInput.value = `[Fantastic Fashion] New Message from ${nameVal} ✨`;
+            subjectInput.value = `[Fantastic Fashions] New Message from ${nameVal} ✨`;
         }
         
         // 1. Honeypot check
@@ -1207,7 +1207,7 @@ function initContactForm() {
         const successIconEmoji = document.getElementById("success-icon-emoji");
         
         if (successHeader) successHeader.innerText = "Message Sent Successfully!";
-        if (successBody) successBody.innerText = "Yay! Thank you so much for supporting Fantastic Fashion. Kayla and Erika will look at your message and reply back to your email address soon!";
+        if (successBody) successBody.innerText = "Yay! Thank you so much for supporting Fantastic Fashions. Kayla and Erika will look at your message and reply back to your email address soon!";
         if (successIconEmoji) successIconEmoji.innerText = "🎉";
     });
     
@@ -1234,7 +1234,7 @@ function initContactForm() {
             successHeader.innerText = `Thanks, ${nameVal}! ✨`;
         }
         if (successBody && nameVal) {
-            successBody.innerText = `Yay! Thank you so much for supporting Fantastic Fashion, ${nameVal}. Kayla and Erika have received your message and will reply back to your email address soon!`;
+            successBody.innerText = `Yay! Thank you so much for supporting Fantastic Fashions, ${nameVal}. Kayla and Erika have received your message and will reply back to your email address soon!`;
         }
         if (successIconEmoji) {
             successIconEmoji.innerText = "💖";
