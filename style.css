@@ -1224,13 +1224,13 @@ h2 {
 #team-erika {
     box-shadow: 0 8px 24px rgba(0, 229, 255, 0.05), 0 0 0 1px rgba(0, 229, 255, 0.05);
 }
-#team-aria {
-    box-shadow: 0 8px 24px rgba(176, 38, 255, 0.05), 0 0 0 1px rgba(176, 38, 255, 0.05);
+#team-connor {
+    box-shadow: 0 8px 24px rgba(45, 108, 255, 0.05), 0 0 0 1px rgba(45, 108, 255, 0.05);
 }
-#team-sora {
+#team-claire {
     box-shadow: 0 8px 24px rgba(255, 215, 0, 0.05), 0 0 0 1px rgba(255, 215, 0, 0.05);
 }
-#team-francesca {
+#team-brooke {
     box-shadow: 0 8px 24px rgba(46, 204, 113, 0.05), 0 0 0 1px rgba(46, 204, 113, 0.05);
 }
 
@@ -1247,15 +1247,15 @@ h2 {
     box-shadow: 0 12px 30px rgba(0, 229, 255, 0.18), 0 0 12px rgba(0, 229, 255, 0.1);
     border-color: rgba(0, 229, 255, 0.2);
 }
-#team-aria:hover {
-    box-shadow: 0 12px 30px rgba(176, 38, 255, 0.18), 0 0 12px rgba(176, 38, 255, 0.1);
-    border-color: rgba(176, 38, 255, 0.2);
+#team-connor:hover {
+    box-shadow: 0 12px 30px rgba(45, 108, 255, 0.18), 0 0 12px rgba(45, 108, 255, 0.1);
+    border-color: rgba(45, 108, 255, 0.2);
 }
-#team-sora:hover {
+#team-claire:hover {
     box-shadow: 0 12px 30px rgba(255, 215, 0, 0.18), 0 0 12px rgba(255, 215, 0, 0.1);
     border-color: rgba(255, 215, 0, 0.25);
 }
-#team-francesca:hover {
+#team-brooke:hover {
     box-shadow: 0 12px 30px rgba(46, 204, 113, 0.18), 0 0 12px rgba(46, 204, 113, 0.1);
     border-color: rgba(46, 204, 113, 0.2);
 }
@@ -1277,13 +1277,13 @@ h2 {
 #team-erika .avatar-wrapper {
     box-shadow: 0 0 0 3px #00e5ff; /* turquoise solid outer border */
 }
-#team-aria .avatar-wrapper {
-    box-shadow: 0 0 0 3px #b026ff; /* violet solid outer border */
+#team-connor .avatar-wrapper {
+    box-shadow: 0 0 0 3px #2d6cff; /* royal blue solid outer border */
 }
-#team-sora .avatar-wrapper {
+#team-claire .avatar-wrapper {
     box-shadow: 0 0 0 3px #ffd700; /* gold solid outer border */
 }
-#team-francesca .avatar-wrapper {
+#team-brooke .avatar-wrapper {
     box-shadow: 0 0 0 3px #2ecc71; /* green solid outer border */
 }
 
@@ -1319,22 +1319,22 @@ h2 {
     box-shadow: inset -10px -10px 25px rgba(0, 100, 120, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
 }
 
-.bead-aria {
-    background-image: url('assets/avatar_aria.png');
+.bead-connor {
+    background-image: url('assets/avatar_connor.png');
     background-size: cover;
     background-position: center;
-    box-shadow: inset -10px -10px 25px rgba(80, 0, 130, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
+    box-shadow: inset -10px -10px 25px rgba(0, 35, 120, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
 }
 
-.bead-sora {
-    background-image: url('assets/avatar_sora.png');
+.bead-claire {
+    background-image: url('assets/avatar_claire.png');
     background-size: cover;
     background-position: center;
     box-shadow: inset -10px -10px 25px rgba(130, 100, 0, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
 }
 
-.bead-francesca {
-    background-image: url('assets/avatar_francesca.png');
+.bead-brooke {
+    background-image: url('assets/avatar_brooke.png');
     background-size: cover;
     background-position: center;
     box-shadow: inset -10px -10px 25px rgba(20, 100, 50, 0.45), inset 10px 10px 25px rgba(255, 255, 255, 0.55);
@@ -1374,19 +1374,19 @@ h2 {
     border: 2px solid #00e5ff;
 }
 
-.badge-employee-aria {
-    background-color: rgba(176, 38, 255, 0.08);
-    color: #9c27b0;
-    border: 2px solid #b026ff;
+.badge-employee-connor {
+    background-color: rgba(45, 108, 255, 0.08);
+    color: #1a56db;
+    border: 2px solid #2d6cff;
 }
 
-.badge-employee-sora {
+.badge-employee-claire {
     background-color: rgba(255, 215, 0, 0.08);
     color: #e65100;
     border: 2px solid #ffd700;
 }
 
-.badge-employee-francesca {
+.badge-employee-brooke {
     background-color: rgba(46, 204, 113, 0.08);
     color: #27ae60;
     border: 2px solid #2ecc71;
@@ -2126,15 +2126,15 @@ footer p:first-child {
     color: #00e5ff !important;
     border-color: #00e5ff !important;
 }
-.rainbow-shimmer-active .badge-employee-aria {
-    color: #b026ff !important;
-    border-color: #b026ff !important;
+.rainbow-shimmer-active .badge-employee-connor {
+    color: #2d6cff !important;
+    border-color: #2d6cff !important;
 }
-.rainbow-shimmer-active .badge-employee-sora {
+.rainbow-shimmer-active .badge-employee-claire {
     color: #ffd700 !important;
     border-color: #ffd700 !important;
 }
-.rainbow-shimmer-active .badge-employee-francesca {
+.rainbow-shimmer-active .badge-employee-brooke {
     color: #2ecc71 !important;
     border-color: #2ecc71 !important;
 }

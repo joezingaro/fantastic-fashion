@@ -1261,21 +1261,21 @@ function initTeamFireworks() {
     const teamEmojis = {
         kayla: ["👑", "💖", "🌸", "⭐", "⚪", "💕", "🌺", "🎀", "💝"],
         erika: ["🪄", "🩵", "💎", "⭐", "🫧", "💙", "💠", "✨", "🌀"],
-        aria: ["🎨", "💜", "🔮", "⭐", "💮", "💟", "🪻", "🦄", "🟣"],
-        sora: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"],
-        francesca: ["🍀", "💚", "🍃", "⭐", "🦖", "❇️", "🌿", "🥑", "🟢"]
+        connor: ["🎨", "🔵", "🔷", "⭐", "🧊", "🌊", "🫐", "🚀", "🐳"],
+        claire: ["☀️", "💛", "🌟", "🌼", "🌻", "🟡", "⭐", "🔆", "🍊"],
+        brooke: ["🍀", "💚", "🍃", "⭐", "🦖", "❇️", "🌿", "🥑", "🟢"]
     };
     const teamColors = {
         kayla: "#ff2a85",
         erika: "#00e5ff",
-        aria: "#b026ff",
-        sora: "#ffd700",
-        francesca: "#2ecc71"
+        connor: "#2d6cff",
+        claire: "#ffd700",
+        brooke: "#2ecc71"
     };
 
     teamCards.forEach(card => {
         card.addEventListener("click", (e) => {
-            const memberId = card.id.replace("team-", ""); // kayla, erika, aria, sora
+            const memberId = card.id.replace("team-", ""); // kayla, erika, connor, claire, brooke
             const emojis = teamEmojis[memberId];
             if (!emojis) return;
 
